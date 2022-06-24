@@ -1,7 +1,5 @@
 package MateBotSDKGo
 
-import "time"
-
 type Error struct {
 	Error   bool   `json:"error"`
 	Status  int    `json:"status"`
