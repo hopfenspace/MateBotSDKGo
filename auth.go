@@ -51,7 +51,6 @@ func GetLoginToken(username string, password string, baseURL string) (Token, err
 			log.Println("No valid JSON body:", err)
 			return token, err
 		}
-		fmt.Println(token)
 		return token, err
 	} else {
 		e := Error{}
