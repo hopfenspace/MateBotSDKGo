@@ -129,10 +129,3 @@ func post(endpoint string, content []byte, sdk *SDK, retry bool) (int, []byte, e
 func Post(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
 	return post(endpoint, content, sdk, true)
 }
-
-type newAlias struct {
-	UserId        int    `json:"user_id"`
-	ApplicationId int    `json:"application_id"`
-	Username      string `json:"username"`
-	Confirmed     bool   `json:"confirmed"`
-}
