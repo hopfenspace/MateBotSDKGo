@@ -26,7 +26,7 @@ type Status struct {
 	ApiVersion     int         `json:"api_version"`
 	ProjectVersion VersionInfo `json:"project_version"`
 	Timezone       *string     `json:"timezone"`
-	Localtime      time.Time   `json:"localtime"`
+	Localtime      string      `json:"localtime"`
 	Timestamp      int         `json:"timestamp"`
 }
 
