@@ -3,7 +3,6 @@ package MateBotSDKGo
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -131,18 +130,9 @@ func Post(endpoint string, content []byte, config SDK) (int, []byte, error) {
 	return post(endpoint, content, config, true)
 }
 
-func GetStatus(config SDKConfig) (Status, error) {
-	code, body, err := Get("/v1/status", nil, config)
-	if code != 200 {
-		err = errors.New(fmt.Sprintf("response code %d for status request", code))
-		return Status{}, err
-	}
-
-	status := Status{}
-	err = json.Unmarshal(body, &status)
-	if err != nil {
-		log.Println("No valid JSON body:", err)
-		return Status{}, err
-	}
-	return status, err
+type newAlias struct {
+	UserId        int    `json:"user_id"`
+	ApplicationId int    `json:"application_id"`
+	Username      string `json:"username"`
+	Confirmed     bool   `json:"confirmed"`
 }
