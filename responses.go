@@ -34,6 +34,16 @@ type Status struct {
 	Timestamp      int         `json:"timestamp"`
 }
 
+type Settings struct {
+	MinRefundApproves          int `json:"min_refund_approves"`
+	MinRefundDisapproves       int `json:"min_refund_disapproves"`
+	MinMembershipApproves      int `json:"min_membership_approves"`
+	MinMembershipDisapproves   int `json:"min_membership_disapproves"`
+	MaxParallelDebtors         int `json:"max_parallel_debtors"`
+	MaxSimultaneousConsumption int `json:"max_simultaneous_consumption"`
+	MaxTransactionAmount       int `json:"max_transaction_amount"`
+}
+
 type Application struct {
 	Id      int    `json:"id"`
 	Name    string `json:"name"`
