@@ -25,7 +25,7 @@ func get(endpoint string, filter map[string]string, config SDKConfig, retry bool
 
 	request, err := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		return 0, []byte{}, err
+		return 0, nil, err
 	}
 	request.Header.Set("Authorization", "Bearer "+config.AccessToken)
 
@@ -33,7 +33,7 @@ func get(endpoint string, filter map[string]string, config SDKConfig, retry bool
 	response, err := client.Do(request)
 	if err != nil {
 		log.Println(fmt.Sprintf("Error performing 'GET %s' request:", uri), err)
-		return 0, []byte{}, err
+		return 0, nil, err
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -46,18 +46,28 @@ func get(endpoint string, filter map[string]string, config SDKConfig, retry bool
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Println("Read all of response body failed:", err)
-		return response.StatusCode, []byte{}, err
+		return response.StatusCode, nil, err
 	}
 
 	if response.StatusCode == 401 && retry {
 		log.Println("Invalid login token, trying to refresh...")
 		token, err := GetLoginToken(config.Username, config.Password, config.BaseUrl)
 		if err != nil {
-			return 401, []byte{}, err
+			return 401, nil, err
 		}
 		config.AccessToken = token.AccessToken
 		return get(endpoint, filter, config, false)
 	}
+
+	if response.StatusCode >= 400 {
+		var e Error
+		if err := json.Unmarshal(body, &e); err != nil {
+			log.Println("No valid JSON body:", err)
+			return response.StatusCode, nil, err
+		}
+		return response.StatusCode, nil, e
+	}
+
 	return response.StatusCode, body, err
 }
 

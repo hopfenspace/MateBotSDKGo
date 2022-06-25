@@ -1,13 +1,17 @@
 package MateBotSDKGo
 
 type Error struct {
-	Error   bool   `json:"error"`
+	IsError bool   `json:"error"`
 	Status  int    `json:"status"`
 	Method  string `json:"method"`
 	Request string `json:"request"`
 	Repeat  bool   `json:"repeat"`
 	Message string `json:"message"`
 	Details string `json:"details"`
+}
+
+func (e Error) Error() string {
+	return e.Message
 }
 
 type Token struct {
