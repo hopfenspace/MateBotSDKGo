@@ -30,6 +30,12 @@ type Status struct {
 	Timestamp      int         `json:"timestamp"`
 }
 
+type Application struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	Created int    `json:"created"`
+}
+
 type Callback struct {
 	Id            int     `json:"id"`
 	Url           string  `json:"url"`
@@ -73,6 +79,12 @@ type MultiTransaction struct {
 	TotalAmount  int           `json:"total_amount"`
 	Transactions []Transaction `json:"transactions"`
 	Timestamp    int           `json:"timestamp"`
+}
+
+type Consumable struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
 }
 
 type CommunismParticipant struct {
