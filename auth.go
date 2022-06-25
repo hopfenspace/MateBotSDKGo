@@ -3,13 +3,11 @@ package MateBotSDKGo
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 func GetLoginToken(username string, password string, baseURL string) (Token, error) {
@@ -46,21 +44,18 @@ func GetLoginToken(username string, password string, baseURL string) (Token, err
 	}
 
 	if response.StatusCode == 200 {
-		err = json.Unmarshal(body, &token)
-		if err != nil {
+		if err = json.Unmarshal(body, &token); err != nil {
 			log.Println("No valid JSON body:", err)
 			return token, err
 		}
 		return token, err
 	} else {
 		e := Error{}
-		err = json.Unmarshal(body, &e)
-		if err != nil {
+		if err = json.Unmarshal(body, &e); err != nil {
 			log.Println("No valid JSON body: err")
 			return token, err
 		}
-		err = errors.New(fmt.Sprintf("code %d with msg %s", response.StatusCode, strings.ToLower(e.Message)))
-		log.Println("Failed to login:", err)
-		return token, err
+		logError(e)
+		return token, e
 	}
 }
