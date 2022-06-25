@@ -16,7 +16,7 @@ type SDK struct {
 	ServerVersion VersionInfo
 }
 
-func (sdk SDK) GetStatus() (Status, error) {
+func (sdk *SDK) GetStatus() (Status, error) {
 	status := Status{}
 	_, body, err := Get("/v1/status", nil, sdk)
 	if err != nil {
@@ -30,7 +30,7 @@ func (sdk SDK) GetStatus() (Status, error) {
 	return status, err
 }
 
-func (sdk SDK) GetApplications(filter map[string]string) ([]Application, error) {
+func (sdk *SDK) GetApplications(filter map[string]string) ([]Application, error) {
 	_, body, err := Get("/v1/applications", filter, sdk)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (sdk SDK) GetApplications(filter map[string]string) ([]Application, error) 
 	return apps, err
 }
 
-func (sdk SDK) GetUsers(filter map[string]string) ([]User, error) {
+func (sdk *SDK) GetUsers(filter map[string]string) ([]User, error) {
 	_, body, err := Get("/v1/users", filter, sdk)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (sdk SDK) GetUsers(filter map[string]string) ([]User, error) {
 	return users, err
 }
 
-func (sdk SDK) NewUser() (User, error) {
+func (sdk *SDK) NewUser() (User, error) {
 	_, body, err := Post("/v1/users", nil, sdk)
 	if err != nil {
 		return User{}, err
@@ -72,7 +72,7 @@ func (sdk SDK) NewUser() (User, error) {
 	return user, err
 }
 
-func (sdk SDK) NewAlias(userID int, username string) (Alias, error) {
+func (sdk *SDK) NewAlias(userID int, username string) (Alias, error) {
 	alias := Alias{}
 	content, err := json.Marshal(newAlias{
 		UserId:        userID,
@@ -96,7 +96,7 @@ func (sdk SDK) NewAlias(userID int, username string) (Alias, error) {
 	return alias, err
 }
 
-func (sdk SDK) NewUserWithAlias(username string) (User, error) {
+func (sdk *SDK) NewUserWithAlias(username string) (User, error) {
 	user, err := sdk.NewUser()
 	if err != nil {
 		return User{}, err
