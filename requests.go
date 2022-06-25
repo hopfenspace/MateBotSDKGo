@@ -11,7 +11,7 @@ import (
 	"net/url"
 )
 
-func get(endpoint string, filter map[string]string, config SDKConfig, retry bool) (int, []byte, error) {
+func get(endpoint string, filter map[string]string, config SDK, retry bool) (int, []byte, error) {
 	uri := config.BaseUrl + endpoint
 	query := url.Values(map[string][]string{})
 	if filter != nil {
@@ -65,17 +65,17 @@ func get(endpoint string, filter map[string]string, config SDKConfig, retry bool
 			log.Println("No valid JSON body:", err)
 			return response.StatusCode, nil, err
 		}
+		logError(e)
 		return response.StatusCode, nil, e
 	}
-
 	return response.StatusCode, body, err
 }
 
-func Get(endpoint string, filter map[string]string, config SDKConfig) (int, []byte, error) {
+func Get(endpoint string, filter map[string]string, config SDK) (int, []byte, error) {
 	return get(endpoint, filter, config, true)
 }
 
-func post(endpoint string, content []byte, config SDKConfig, retry bool) (int, []byte, error) {
+func post(endpoint string, content []byte, config SDK, retry bool) (int, []byte, error) {
 	uri := config.BaseUrl + endpoint
 
 	request, err := http.NewRequest("POST", uri, bytes.NewBuffer(content))
@@ -114,10 +114,20 @@ func post(endpoint string, content []byte, config SDKConfig, retry bool) (int, [
 		config.AccessToken = token.AccessToken
 		return post(endpoint, content, config, false)
 	}
+
+	if response.StatusCode >= 400 {
+		var e Error
+		if err := json.Unmarshal(body, &e); err != nil {
+			log.Println("No valid JSON body:", err)
+			return response.StatusCode, nil, err
+		}
+		logError(e)
+		return response.StatusCode, nil, e
+	}
 	return response.StatusCode, body, err
 }
 
-func Post(endpoint string, content []byte, config SDKConfig) (int, []byte, error) {
+func Post(endpoint string, content []byte, config SDK) (int, []byte, error) {
 	return post(endpoint, content, config, true)
 }
 
