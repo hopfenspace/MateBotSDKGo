@@ -1,18 +1,18 @@
 package internal
 
 type IdBody struct {
-	Id int `json:"id"`
+	Id uint `json:"id"`
 }
 
 type NewCallback struct {
 	Url           string `json:"url"`
-	ApplicationId int    `json:"application_id"`
+	ApplicationId uint   `json:"application_id"`
 	SharedSecret  string `json:"shared_secret"`
 }
 
 type NewAlias struct {
-	UserId        int    `json:"user_id"`
-	ApplicationId int    `json:"application_id"`
+	UserId        uint   `json:"user_id"`
+	ApplicationId uint   `json:"application_id"`
 	Username      string `json:"username"`
 	Confirmed     bool   `json:"confirmed"`
 }
@@ -20,19 +20,19 @@ type NewAlias struct {
 type NewTransaction struct {
 	Sender   int    `json:"sender"`
 	Receiver int    `json:"receiver"`
-	Amount   int    `json:"amount"`
+	Amount   uint   `json:"amount"`
 	Reason   string `json:"reason"`
 }
 
 type NewCommunism struct {
-	Amount      int    `json:"amount"`
+	Amount      uint   `json:"amount"`
 	Description string `json:"description"`
-	Creator     int    `json:"creator"`
+	Creator     uint   `json:"creator"`
 }
 
 type NewConsumption struct {
-	User       int    `json:"user"`
-	Amount     int    `json:"amount"`
+	User       uint   `json:"user"`
+	Amount     uint   `json:"amount"`
 	Consumable string `json:"consumable"`
 }
 

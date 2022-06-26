@@ -20,76 +20,76 @@ type Token struct {
 }
 
 type VersionInfo struct {
-	Major int `json:"major"`
-	Minor int `json:"minor"`
-	Micro int `json:"micro"`
+	Major uint `json:"major"`
+	Minor uint `json:"minor"`
+	Micro uint `json:"micro"`
 }
 
 type Status struct {
-	Startup        *int        `json:"startup"`
-	ApiVersion     int         `json:"api_version"`
+	Startup        *uint       `json:"startup"`
+	ApiVersion     uint        `json:"api_version"`
 	ProjectVersion VersionInfo `json:"project_version"`
 	Timezone       *string     `json:"timezone"`
 	Localtime      string      `json:"localtime"`
-	Timestamp      int         `json:"timestamp"`
+	Timestamp      uint        `json:"timestamp"`
 }
 
 type Settings struct {
-	MinRefundApproves          int `json:"min_refund_approves"`
-	MinRefundDisapproves       int `json:"min_refund_disapproves"`
-	MinMembershipApproves      int `json:"min_membership_approves"`
-	MinMembershipDisapproves   int `json:"min_membership_disapproves"`
-	MaxParallelDebtors         int `json:"max_parallel_debtors"`
-	MaxSimultaneousConsumption int `json:"max_simultaneous_consumption"`
-	MaxTransactionAmount       int `json:"max_transaction_amount"`
+	MinRefundApproves          uint `json:"min_refund_approves"`
+	MinRefundDisapproves       uint `json:"min_refund_disapproves"`
+	MinMembershipApproves      uint `json:"min_membership_approves"`
+	MinMembershipDisapproves   uint `json:"min_membership_disapproves"`
+	MaxParallelDebtors         uint `json:"max_parallel_debtors"`
+	MaxSimultaneousConsumption uint `json:"max_simultaneous_consumption"`
+	MaxTransactionAmount       uint `json:"max_transaction_amount"`
 }
 
 type Application struct {
-	Id      int    `json:"id"`
+	Id      uint   `json:"id"`
 	Name    string `json:"name"`
-	Created int    `json:"created"`
+	Created uint   `json:"created"`
 }
 
 type Callback struct {
-	Id            int     `json:"id"`
+	Id            uint    `json:"id"`
 	Url           string  `json:"url"`
-	ApplicationId *int    `json:"application_id"`
+	ApplicationId *uint   `json:"application_id"`
 	SharedSecret  *string `json:"shared_secret"`
 }
 
 type Alias struct {
-	Id            int    `json:"id"`
-	UserId        int    `json:"user_id"`
-	ApplicationId int    `json:"application_id"`
+	Id            uint   `json:"id"`
+	UserId        uint   `json:"user_id"`
+	ApplicationId uint   `json:"application_id"`
 	Username      string `json:"username"`
 	Confirmed     bool   `json:"confirmed"`
 }
 
 type AliasDeletion struct {
-	UserId  int     `json:"user_id"`
+	UserId  uint    `json:"user_id"`
 	Aliases []Alias `json:"aliases"`
 }
 
 type User struct {
-	Id         int     `json:"id"`
+	Id         uint    `json:"id"`
 	Balance    int     `json:"balance"`
 	Permission bool    `json:"permission"`
 	Active     bool    `json:"active"`
 	External   bool    `json:"external"`
-	VoucherId  *int    `json:"voucher_id"`
+	VoucherId  *uint   `json:"voucher_id"`
 	Aliases    []Alias `json:"aliases"`
-	Created    int     `json:"created"`
-	Modified   int     `json:"modified"`
+	Created    uint    `json:"created"`
+	Modified   uint    `json:"modified"`
 }
 
 type Transaction struct {
-	Id                 int     `json:"id"`
+	Id                 uint    `json:"id"`
 	Sender             User    `json:"sender"`
 	Receiver           User    `json:"receiver"`
-	Amount             int     `json:"amount"`
+	Amount             uint    `json:"amount"`
 	Reason             *string `json:"reason"`
-	MultiTransactionId *int    `json:"multi_transaction_id"`
-	Timestamp          int     `json:"timestamp"`
+	MultiTransactionId *uint   `json:"multi_transaction_id"`
+	Timestamp          uint    `json:"timestamp"`
 }
 
 type VoucherUpdate struct {
@@ -99,67 +99,67 @@ type VoucherUpdate struct {
 }
 
 type MultiTransaction struct {
-	Id           int           `json:"id"`
-	BaseAmount   int           `json:"base_amount"`
-	TotalAmount  int           `json:"total_amount"`
+	Id           uint          `json:"id"`
+	BaseAmount   uint          `json:"base_amount"`
+	TotalAmount  uint          `json:"total_amount"`
 	Transactions []Transaction `json:"transactions"`
-	Timestamp    int           `json:"timestamp"`
+	Timestamp    uint          `json:"timestamp"`
 }
 
 type Consumable struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Price       int    `json:"price"`
+	Price       uint   `json:"price"`
 }
 
 type CommunismParticipant struct {
-	UserId   int `json:"user_id"`
-	Quantity int `json:"quantity"`
+	UserId   uint `json:"user_id"`
+	Quantity uint `json:"quantity"`
 }
 
 type Communism struct {
-	Id               int                    `json:"id"`
-	Amount           int                    `json:"amount"`
+	Id               uint                   `json:"id"`
+	Amount           uint                   `json:"amount"`
 	Description      string                 `json:"description"`
-	CreatorId        int                    `json:"creator_id"`
+	CreatorId        uint                   `json:"creator_id"`
 	Active           bool                   `json:"active"`
-	Created          int                    `json:"created"`
-	Modified         int                    `json:"modified"`
+	Created          uint                   `json:"created"`
+	Modified         uint                   `json:"modified"`
 	Participants     []CommunismParticipant `json:"participants"`
 	MultiTransaction *MultiTransaction      `json:"multi_transaction"`
 }
 
 type Vote struct {
-	Id       int  `json:"id"`
-	UserId   int  `json:"user_id"`
-	BallotId int  `json:"ballot_id"`
+	Id       uint `json:"id"`
+	UserId   uint `json:"user_id"`
+	BallotId uint `json:"ballot_id"`
 	Vote     bool `json:"vote"`
-	Modified int  `json:"modified"`
+	Modified uint `json:"modified"`
 }
 
 type Poll struct {
-	Id        int    `json:"id"`
+	Id        uint   `json:"id"`
 	Active    bool   `json:"active"`
 	Accepted  *bool  `json:"accepted"`
 	Variant   string `json:"variant"`
 	User      User   `json:"user"`
-	CreatorId int    `json:"creator_id"`
-	BallotId  int    `json:"ballot_id"`
+	CreatorId uint   `json:"creator_id"`
+	BallotId  uint   `json:"ballot_id"`
 	Votes     []Vote `json:"votes"`
-	Created   int    `json:"created"`
-	Modified  int    `json:"modified"`
+	Created   uint   `json:"created"`
+	Modified  uint   `json:"modified"`
 }
 
 type Refund struct {
-	Id          int          `json:"id"`
-	Amount      int          `json:"amount"`
+	Id          uint         `json:"id"`
+	Amount      uint         `json:"amount"`
 	Description string       `json:"description"`
 	Creator     User         `json:"creator"`
 	Active      bool         `json:"active"`
 	Allowed     *bool        `json:"allowed"`
-	BallotId    int          `json:"ballot_id"`
+	BallotId    uint         `json:"ballot_id"`
 	Votes       []Vote       `json:"votes"`
 	Transaction *Transaction `json:"transaction"`
-	Created     *int         `json:"created"`
-	Modified    *int         `json:"modified"`
+	Created     *uint        `json:"created"`
+	Modified    *uint        `json:"modified"`
 }

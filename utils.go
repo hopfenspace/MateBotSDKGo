@@ -43,7 +43,7 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 	sdk.ApplicationID = apps[0].Id
 
 	if callbackURL != nil {
-		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(sdk.ApplicationID)})
+		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 		if _, err := sdk.NewCallback(*callbackURL, sdk.ApplicationID, *callbackSecret); err != nil {
 			return nil, err
 		}
-		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(sdk.ApplicationID)})
+		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
 		if err != nil {
 			return nil, err
 		}

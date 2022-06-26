@@ -12,10 +12,10 @@ type SDK struct {
 	BaseUrl       string
 	Username      string
 	Password      string
-	ApplicationID int
+	ApplicationID uint
 	AccessToken   string
 	Callbacks     []Callback
-	APIVersion    int
+	APIVersion    uint
 	ServerVersion VersionInfo
 }
 
@@ -521,7 +521,7 @@ func (sdk *SDK) DeleteUserByIssuerID(userID int, issuerID int) (User, error) {
 	return user, err
 }
 
-func (sdk *SDK) NewAlias(userID int, username string) (Alias, error) {
+func (sdk *SDK) NewAlias(userID uint, username string) (Alias, error) {
 	alias := Alias{}
 	content, err := json.Marshal(internal.NewAlias{
 		UserId:        userID,
@@ -556,7 +556,7 @@ func (sdk *SDK) NewUserWithAlias(username string) (User, error) {
 		return user, err
 	}
 
-	users, err := sdk.GetUsers(map[string]string{"id": strconv.Itoa(user.Id)})
+	users, err := sdk.GetUsers(map[string]string{"id": strconv.Itoa(int(user.Id))})
 	if err != nil {
 		return user, err
 	}
@@ -651,7 +651,7 @@ func (sdk *SDK) DeleteAliasByIssuerID(aliasID int, issuerID int) (AliasDeletion,
 	return deletion, err
 }
 
-func (sdk *SDK) NewCallback(url string, applicationID int, sharedSecret string) (Callback, error) {
+func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string) (Callback, error) {
 	callback := Callback{}
 	content, err := json.Marshal(internal.NewCallback{
 		Url:           url,
@@ -674,7 +674,7 @@ func (sdk *SDK) NewCallback(url string, applicationID int, sharedSecret string) 
 	return callback, err
 }
 
-func (sdk *SDK) DeleteCallback(id int) (bool, error) {
+func (sdk *SDK) DeleteCallback(id uint) (bool, error) {
 	content, err := json.Marshal(internal.IdBody{Id: id})
 	if err != nil {
 		return false, err
