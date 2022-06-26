@@ -377,6 +377,106 @@ func (sdk *SDK) DropPermissionOfUserNameByIssuerID(username string, issuerID *in
 	return user, err
 }
 
+func (sdk *SDK) SetVoucherIDForDebtorID(debtorID int, voucherID *int) (VoucherUpdate, error) {
+	update := VoucherUpdate{}
+	content, err := json.Marshal(struct {
+		Debtor  int  `json:"debtor"`
+		Voucher *int `json:"voucher"`
+	}{
+		Debtor:  debtorID,
+		Voucher: voucherID,
+	})
+	if err != nil {
+		return update, err
+	}
+
+	_, body, err := Post("/v1/users/setVoucher", content, sdk)
+	if err != nil {
+		return update, err
+	}
+
+	if err = json.Unmarshal(body, &update); err != nil {
+		log.Println("No valid JSON body:", err)
+		return update, err
+	}
+	return update, err
+}
+
+func (sdk *SDK) SetVoucherNameForDebtorID(debtorID int, voucher *string) (VoucherUpdate, error) {
+	update := VoucherUpdate{}
+	content, err := json.Marshal(struct {
+		Debtor  int     `json:"debtor"`
+		Voucher *string `json:"voucher"`
+	}{
+		Debtor:  debtorID,
+		Voucher: voucher,
+	})
+	if err != nil {
+		return update, err
+	}
+
+	_, body, err := Post("/v1/users/setVoucher", content, sdk)
+	if err != nil {
+		return update, err
+	}
+
+	if err = json.Unmarshal(body, &update); err != nil {
+		log.Println("No valid JSON body:", err)
+		return update, err
+	}
+	return update, err
+}
+
+func (sdk *SDK) SetVoucherIDForDebtorName(debtor string, voucherID *int) (VoucherUpdate, error) {
+	update := VoucherUpdate{}
+	content, err := json.Marshal(struct {
+		Debtor  string `json:"debtor"`
+		Voucher *int   `json:"voucher"`
+	}{
+		Debtor:  debtor,
+		Voucher: voucherID,
+	})
+	if err != nil {
+		return update, err
+	}
+
+	_, body, err := Post("/v1/users/setVoucher", content, sdk)
+	if err != nil {
+		return update, err
+	}
+
+	if err = json.Unmarshal(body, &update); err != nil {
+		log.Println("No valid JSON body:", err)
+		return update, err
+	}
+	return update, err
+}
+
+func (sdk *SDK) SetVoucherNameForDebtorName(debtor string, voucher *string) (VoucherUpdate, error) {
+	update := VoucherUpdate{}
+	content, err := json.Marshal(struct {
+		Debtor  string  `json:"debtor"`
+		Voucher *string `json:"voucher"`
+	}{
+		Debtor:  debtor,
+		Voucher: voucher,
+	})
+	if err != nil {
+		return update, err
+	}
+
+	_, body, err := Post("/v1/users/setVoucher", content, sdk)
+	if err != nil {
+		return update, err
+	}
+
+	if err = json.Unmarshal(body, &update); err != nil {
+		log.Println("No valid JSON body:", err)
+		return update, err
+	}
+	return update, err
+}
+
 func (sdk *SDK) DeleteUserByIssuerName(userID int, issuer string) (User, error) {
 	user := User{}
 	content, err := json.Marshal(internal.UpdateIdIssuerName{

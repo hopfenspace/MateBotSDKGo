@@ -92,6 +92,12 @@ type Transaction struct {
 	Timestamp          int     `json:"timestamp"`
 }
 
+type VoucherUpdate struct {
+	Debtor      User         `json:"debtor"`
+	Voucher     *User        `json:"voucher"`
+	Transaction *Transaction `json:"transaction"`
+}
+
 type MultiTransaction struct {
 	Id           int           `json:"id"`
 	BaseAmount   int           `json:"base_amount"`

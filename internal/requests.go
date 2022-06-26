@@ -88,8 +88,3 @@ type UpdateUserNameIssuerName struct {
 	User   string  `json:"user"`
 	Issuer *string `json:"issuer"`
 }
-
-type UpdateDebtorVoucher struct {
-	Debtor  int `json:"debtor"`
-	Voucher int `json:"voucher"`
-}
