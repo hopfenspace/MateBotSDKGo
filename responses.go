@@ -65,6 +65,11 @@ type Alias struct {
 	Confirmed     bool   `json:"confirmed"`
 }
 
+type AliasDeletion struct {
+	UserId  int     `json:"user_id"`
+	Aliases []Alias `json:"aliases"`
+}
+
 type User struct {
 	Id         int     `json:"id"`
 	Balance    int     `json:"balance"`

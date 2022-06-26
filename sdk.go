@@ -201,6 +201,226 @@ func (sdk *SDK) NewUser() (User, error) {
 	return user, err
 }
 
+func (sdk *SDK) DropInternalOfUserIDByIssuerName(userID int, issuer *string) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserIssuerName{
+		User:   userID,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropInternalOfUserIDByIssuerID(userID int, issuerID *int) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserIssuer{
+		User:   userID,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropInternalOfUserNameByIssuerName(username string, issuer *string) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserNameIssuerName{
+		User:   username,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropInternalOfUserNameByIssuerID(username string, issuerID *int) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserNameIssuer{
+		User:   username,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropPermissionOfUserIDByIssuerName(userID int, issuer *string) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserIssuerName{
+		User:   userID,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropPermission", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropPermissionOfUserIDByIssuerID(userID int, issuerID *int) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserIssuer{
+		User:   userID,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropPermission", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropPermissionOfUserNameByIssuerName(username string, issuer *string) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserNameIssuerName{
+		User:   username,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropPermission", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DropPermissionOfUserNameByIssuerID(username string, issuerID *int) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateUserNameIssuer{
+		User:   username,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/dropPermission", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DeleteUserByIssuerName(userID int, issuer string) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateIdIssuerName{
+		Id:         userID,
+		IssuerName: issuer,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/delete", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (sdk *SDK) DeleteUserByIssuerID(userID int, issuerID int) (User, error) {
+	user := User{}
+	content, err := json.Marshal(internal.UpdateIdIssuer{
+		Id:     userID,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return user, err
+	}
+
+	_, body, err := Post("/v1/users/delete", content, sdk)
+	if err != nil {
+		return user, err
+	}
+
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return user, err
+	}
+	return user, err
+}
+
 func (sdk *SDK) NewAlias(userID int, username string) (Alias, error) {
 	alias := Alias{}
 	content, err := json.Marshal(internal.NewAlias{
@@ -241,6 +461,94 @@ func (sdk *SDK) NewUserWithAlias(username string) (User, error) {
 		return user, err
 	}
 	return users[0], err
+}
+
+func (sdk *SDK) ConfirmAliasByIssuerName(aliasID int, issuer string) (Alias, error) {
+	alias := Alias{}
+	content, err := json.Marshal(internal.UpdateIdIssuerName{
+		Id:         aliasID,
+		IssuerName: issuer,
+	})
+	if err != nil {
+		return alias, err
+	}
+
+	_, body, err := Post("/v1/aliases/confirm", content, sdk)
+	if err != nil {
+		return alias, err
+	}
+
+	if err = json.Unmarshal(body, &alias); err != nil {
+		log.Println("No valid JSON body:", err)
+		return alias, err
+	}
+	return alias, err
+}
+
+func (sdk *SDK) ConfirmAliasByIssuerID(aliasID int, issuerID int) (Alias, error) {
+	alias := Alias{}
+	content, err := json.Marshal(internal.UpdateIdIssuer{
+		Id:     aliasID,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return alias, err
+	}
+
+	_, body, err := Post("/v1/aliases/confirm", content, sdk)
+	if err != nil {
+		return alias, err
+	}
+
+	if err = json.Unmarshal(body, &alias); err != nil {
+		log.Println("No valid JSON body:", err)
+		return alias, err
+	}
+	return alias, err
+}
+
+func (sdk *SDK) DeleteAliasByIssuerName(aliasID int, issuer string) (AliasDeletion, error) {
+	deletion := AliasDeletion{}
+	content, err := json.Marshal(internal.UpdateIdIssuerName{
+		Id:         aliasID,
+		IssuerName: issuer,
+	})
+	if err != nil {
+		return deletion, err
+	}
+
+	_, body, err := Post("/v1/aliases/delete", content, sdk)
+	if err != nil {
+		return deletion, err
+	}
+
+	if err = json.Unmarshal(body, &deletion); err != nil {
+		log.Println("No valid JSON body:", err)
+		return deletion, err
+	}
+	return deletion, err
+}
+
+func (sdk *SDK) DeleteAliasByIssuerID(aliasID int, issuerID int) (AliasDeletion, error) {
+	deletion := AliasDeletion{}
+	content, err := json.Marshal(internal.UpdateIdIssuer{
+		Id:     aliasID,
+		Issuer: issuerID,
+	})
+	if err != nil {
+		return deletion, err
+	}
+
+	_, body, err := Post("/v1/aliases/delete", content, sdk)
+	if err != nil {
+		return deletion, err
+	}
+
+	if err = json.Unmarshal(body, &deletion); err != nil {
+		log.Println("No valid JSON body:", err)
+		return deletion, err
+	}
+	return deletion, err
 }
 
 func (sdk *SDK) NewCallback(url string, applicationID int, sharedSecret string) (Callback, error) {

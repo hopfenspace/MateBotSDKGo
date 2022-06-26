@@ -59,14 +59,34 @@ type UpdateIdIssuer struct {
 	Issuer int `json:"issuer"`
 }
 
+type UpdateIdIssuerName struct {
+	Id         int    `json:"id"`
+	IssuerName string `json:"issuer"`
+}
+
 type UpdateIdUser struct {
 	Id   int `json:"id"`
 	User int `json:"user"`
 }
 
 type UpdateUserIssuer struct {
-	User   int `json:"user"`
-	Issuer int `json:"issuer"`
+	User   int  `json:"user"`
+	Issuer *int `json:"issuer"`
+}
+
+type UpdateUserNameIssuer struct {
+	User   string `json:"user"`
+	Issuer *int   `json:"issuer"`
+}
+
+type UpdateUserIssuerName struct {
+	User   int     `json:"user"`
+	Issuer *string `json:"issuer"`
+}
+
+type UpdateUserNameIssuerName struct {
+	User   string  `json:"user"`
+	Issuer *string `json:"issuer"`
 }
 
 type UpdateDebtorVoucher struct {
