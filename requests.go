@@ -74,10 +74,10 @@ func Get(endpoint string, filter map[string]string, sdk *SDK) (int, []byte, erro
 	return get(endpoint, filter, sdk, true)
 }
 
-func post(endpoint string, content []byte, sdk *SDK, retry bool) (int, []byte, error) {
+func requestPayload(endpoint string, content []byte, sdk *SDK, retry bool, method string) (int, []byte, error) {
 	uri := sdk.BaseUrl + endpoint
 
-	request, err := http.NewRequest("POST", uri, bytes.NewBuffer(content))
+	request, err := http.NewRequest(method, uri, bytes.NewBuffer(content))
 	if err != nil {
 		return 0, []byte{}, err
 	}
@@ -87,7 +87,7 @@ func post(endpoint string, content []byte, sdk *SDK, retry bool) (int, []byte, e
 	client := http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		log.Println(fmt.Sprintf("Error performing 'POST %s' request:", uri), err)
+		log.Println(fmt.Sprintf("Error performing '%s %s' request:", method, uri), err)
 		return 0, []byte{}, err
 	}
 
@@ -111,7 +111,7 @@ func post(endpoint string, content []byte, sdk *SDK, retry bool) (int, []byte, e
 			return 401, []byte{}, err
 		}
 		sdk.AccessToken = token.AccessToken
-		return post(endpoint, content, sdk, false)
+		return requestPayload(endpoint, content, sdk, false, method)
 	}
 
 	if response.StatusCode >= 400 {
@@ -127,5 +127,9 @@ func post(endpoint string, content []byte, sdk *SDK, retry bool) (int, []byte, e
 }
 
 func Post(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
-	return post(endpoint, content, sdk, true)
+	return requestPayload(endpoint, content, sdk, true, "POST")
+}
+
+func Delete(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
+	return requestPayload(endpoint, content, sdk, true, "DELETE")
 }

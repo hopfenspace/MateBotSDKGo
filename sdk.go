@@ -14,6 +14,7 @@ type SDK struct {
 	Password      string
 	ApplicationID int
 	AccessToken   string
+	Callbacks     []Callback
 	APIVersion    int
 	ServerVersion VersionInfo
 }
@@ -240,4 +241,40 @@ func (sdk *SDK) NewUserWithAlias(username string) (User, error) {
 		return user, err
 	}
 	return users[0], err
+}
+
+func (sdk *SDK) NewCallback(url string, applicationID int, sharedSecret string) (Callback, error) {
+	callback := Callback{}
+	content, err := json.Marshal(internal.NewCallback{
+		Url:           url,
+		ApplicationId: applicationID,
+		SharedSecret:  sharedSecret,
+	})
+	if err != nil {
+		return callback, err
+	}
+
+	_, body, err := Post("/v1/callbacks", content, sdk)
+	if err != nil {
+		return callback, err
+	}
+
+	if err = json.Unmarshal(body, &callback); err != nil {
+		log.Println("No valid JSON body:", err)
+		return callback, err
+	}
+	return callback, err
+}
+
+func (sdk *SDK) DeleteCallback(id int) (bool, error) {
+	content, err := json.Marshal(internal.IdBody{Id: id})
+	if err != nil {
+		return false, err
+	}
+
+	code, _, err := Delete("/v1/callbacks", content, sdk)
+	if err != nil {
+		return code == 204, err
+	}
+	return code == 204, err
 }

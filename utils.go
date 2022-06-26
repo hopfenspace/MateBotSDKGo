@@ -4,9 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 )
 
-func New(baseURL string, username string, password string) (SDK, error) {
+func New(baseURL string, username string, password string, callbackURL *string, callbackSecret *string) (*SDK, error) {
+	if (callbackURL != nil && callbackSecret == nil) || (callbackURL == nil && callbackSecret != nil) {
+		return nil, errors.New("options 'callbackURL' and 'callbackSecret' must both be set or omitted")
+	}
+
 	for baseURL[len(baseURL)-1] == '/' {
 		baseURL = baseURL[:len(baseURL)-1]
 	}
@@ -15,25 +20,48 @@ func New(baseURL string, username string, password string) (SDK, error) {
 		Username: username,
 		Password: password,
 	}
+
 	token, err := GetLoginToken(username, password, baseURL)
 	if err != nil {
-		return SDK{}, err
+		return nil, err
 	}
 	sdk.AccessToken = token.AccessToken
+
 	status, err := sdk.GetStatus()
 	if err != nil {
-		return SDK{}, err
+		return nil, err
 	}
 	sdk.APIVersion = status.ApiVersion
 	sdk.ServerVersion = status.ProjectVersion
+
 	apps, err := sdk.GetApplications(map[string]string{"name": sdk.Username})
 	if err != nil {
-		return SDK{}, err
+		return nil, err
 	} else if len(apps) != 1 {
-		return SDK{}, errors.New("not exactly 1 result from app lookup")
+		return nil, errors.New("not exactly 1 result from app lookup")
 	}
 	sdk.ApplicationID = apps[0].Id
-	return sdk, err
+
+	if callbackURL != nil {
+		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(sdk.ApplicationID)})
+		if err != nil {
+			return nil, err
+		}
+		for _, callback := range callbacks {
+			if success, err := sdk.DeleteCallback(callback.Id); err != nil || !success {
+				return nil, err
+			}
+		}
+		if _, err := sdk.NewCallback(*callbackURL, sdk.ApplicationID, *callbackSecret); err != nil {
+			return nil, err
+		}
+		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(sdk.ApplicationID)})
+		if err != nil {
+			return nil, err
+		}
+		sdk.Callbacks = callbacks
+	}
+	return &sdk, err
 }
 
 func logError(error Error) {
