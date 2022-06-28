@@ -150,6 +150,11 @@ type Poll struct {
 	Modified  uint   `json:"modified"`
 }
 
+type PollVote struct {
+	Poll Poll `json:"poll"`
+	Vote Vote `json:"vote"`
+}
+
 type Refund struct {
 	Id          uint         `json:"id"`
 	Amount      uint         `json:"amount"`
@@ -162,4 +167,9 @@ type Refund struct {
 	Transaction *Transaction `json:"transaction"`
 	Created     *uint        `json:"created"`
 	Modified    *uint        `json:"modified"`
+}
+
+type RefundVote struct {
+	Refund Refund `json:"refund"`
+	Vote   Vote   `json:"vote"`
 }

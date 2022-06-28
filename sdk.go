@@ -187,6 +187,27 @@ func (sdk *SDK) GetVotes(filter map[string]string) ([]Vote, error) {
 	return votes, err
 }
 
+func (sdk *SDK) abortSomething(obj uint, issuer any, endpoint string) ([]byte, error) {
+	err := checkStrOrPosInt(issuer, false)
+	if err != nil {
+		return nil, err
+	}
+
+	content, err := json.Marshal(internal.IssuerIdBody{
+		Id:     obj,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, body, err := Post(endpoint, content, sdk)
+	if err != nil {
+		return nil, err
+	}
+	return body, err
+}
+
 func (sdk *SDK) NewUser() (User, error) {
 	_, body, err := Post("/v1/users", nil, sdk)
 	if err != nil {
@@ -485,20 +506,7 @@ func (sdk *SDK) NewCommunism(creator any, amount uint, description string) (Comm
 
 func (sdk *SDK) abortOrCloseCommunism(communismID uint, issuer any, endpoint string) (Communism, error) {
 	communism := Communism{}
-	err := checkStrOrPosInt(issuer, false)
-	if err != nil {
-		return communism, err
-	}
-
-	content, err := json.Marshal(internal.IssuerIdBody{
-		Id:     communismID,
-		Issuer: issuer,
-	})
-	if err != nil {
-		return communism, err
-	}
-
-	_, body, err := Post(endpoint, content, sdk)
+	body, err := sdk.abortSomething(communismID, issuer, endpoint)
 	if err != nil {
 		return communism, err
 	}
@@ -551,6 +559,132 @@ func (sdk *SDK) IncreaseCommunismParticipation(communismID uint, user any) (Comm
 
 func (sdk *SDK) DecreaseCommunismParticipation(communismID uint, user any) (Communism, error) {
 	return sdk.changeCommunismParticipation(communismID, user, "/v1/communisms/decreaseParticipation")
+}
+
+func (sdk *SDK) NewPoll(user any, issuer any, variant string) (Poll, error) {
+	poll := Poll{}
+	err := checkStrOrPosInt(user, false)
+	if err != nil {
+		return poll, err
+	}
+	err = checkStrOrPosInt(issuer, false)
+	if err != nil {
+		return poll, err
+	}
+
+	content, err := json.Marshal(internal.NewPoll{
+		User:    user,
+		Issuer:  issuer,
+		Variant: variant,
+	})
+	if err != nil {
+		return poll, err
+	}
+
+	_, body, err := Post("/v1/polls", content, sdk)
+	if err != nil {
+		return poll, err
+	}
+
+	if err = json.Unmarshal(body, &poll); err != nil {
+		log.Println("No valid JSON body:", err)
+		return poll, err
+	}
+	return poll, err
+}
+
+func (sdk *SDK) NewRefund(creator any, amount uint, description string) (Refund, error) {
+	refund := Refund{}
+	err := checkStrOrPosInt(creator, false)
+	if err != nil {
+		return refund, err
+	}
+
+	content, err := json.Marshal(internal.NewRefund{
+		Creator:     creator,
+		Amount:      amount,
+		Description: description,
+	})
+	if err != nil {
+		return refund, err
+	}
+
+	_, body, err := Post("/v1/refunds", content, sdk)
+	if err != nil {
+		return refund, err
+	}
+
+	if err = json.Unmarshal(body, &refund); err != nil {
+		log.Println("No valid JSON body:", err)
+		return refund, err
+	}
+	return refund, err
+}
+
+func (sdk *SDK) AbortPoll(pollID uint, issuer any) (Poll, error) {
+	poll := Poll{}
+	body, err := sdk.abortSomething(pollID, issuer, "/v1/polls/abort")
+
+	if err = json.Unmarshal(body, &poll); err != nil {
+		log.Println("No valid JSON body:", err)
+		return poll, err
+	}
+	return poll, err
+}
+
+func (sdk *SDK) AbortRefund(refundID uint, issuer any) (Refund, error) {
+	refund := Refund{}
+	body, err := sdk.abortSomething(refundID, issuer, "/v1/refunds/abort")
+
+	if err = json.Unmarshal(body, &refund); err != nil {
+		log.Println("No valid JSON body:", err)
+		return refund, err
+	}
+	return refund, err
+}
+
+func (sdk *SDK) vote(ballotID uint, user any, vote bool, endpoint string) ([]byte, error) {
+	err := checkStrOrPosInt(user, false)
+	if err != nil {
+		return nil, err
+	}
+
+	content, err := json.Marshal(internal.NewVote{
+		User:     user,
+		BallotId: ballotID,
+		Vote:     vote,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, body, err := Post(endpoint, content, sdk)
+	if err != nil {
+		return nil, err
+	}
+	return body, err
+}
+
+func (sdk *SDK) VoteOnPollBallot(ballotID uint, user any, vote bool) (PollVote, error) {
+	pollVote := PollVote{}
+	body, err := sdk.vote(ballotID, user, vote, "/v1/polls/vote")
+
+	if err = json.Unmarshal(body, &pollVote); err != nil {
+		log.Println("No valid JSON body:", err)
+		return pollVote, err
+	}
+	return pollVote, err
+}
+
+func (sdk *SDK) VoteOnRefundBallot(ballotID uint, user any, vote bool) (RefundVote, error) {
+	refundVote := RefundVote{}
+	body, err := sdk.vote(ballotID, user, vote, "/v1/refunds/vote")
+
+	if err = json.Unmarshal(body, &refundVote); err != nil {
+		log.Println("No valid JSON body:", err)
+		return refundVote, err
+	}
+	return refundVote, err
 }
 
 func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string) (Callback, error) {

@@ -37,20 +37,20 @@ type NewCommunism struct {
 }
 
 type NewPoll struct {
-	User    int    `json:"user"`
-	Issuer  int    `json:"issuer"`
+	User    any    `json:"user"`
+	Issuer  any    `json:"issuer"`
 	Variant string `json:"variant"`
 }
 
 type NewRefund struct {
-	Amount      int    `json:"amount"`
+	Amount      uint   `json:"amount"`
 	Description string `json:"description"`
-	Creator     int    `json:"creator"`
+	Creator     any    `json:"creator"`
 }
 
 type NewVote struct {
-	User     int  `json:"user"`
-	BallotId int  `json:"ballot_id"`
+	User     any  `json:"user"`
+	BallotId uint `json:"ballot_id"`
 	Vote     bool `json:"vote"`
 }
 
