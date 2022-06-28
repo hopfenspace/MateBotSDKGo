@@ -1,135 +1,75 @@
 package MateBotSDKGo
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"net/url"
-)
-
-func get(endpoint string, filter map[string]string, sdk *SDK, retry bool) (int, []byte, error) {
-	uri := sdk.BaseUrl + endpoint
-	query := url.Values(map[string][]string{})
-	if filter != nil {
-		for k, v := range filter {
-			if k != "" {
-				query.Add(k, v)
-			}
-		}
-		uri += "?" + query.Encode()
-	}
-
-	request, err := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
-	if err != nil {
-		return 0, nil, err
-	}
-	request.Header.Set("Authorization", "Bearer "+sdk.AccessToken)
-
-	client := http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Println(fmt.Sprintf("Error performing 'GET %s' request:", uri), err)
-		return 0, nil, err
-	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Println("Unexpected error while closing response buffer:", err)
-		}
-	}(response.Body)
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		log.Println("Read all of response body failed:", err)
-		return response.StatusCode, nil, err
-	}
-
-	if response.StatusCode == 401 && retry {
-		log.Println("Invalid login token, trying to refresh...")
-		token, err := GetLoginToken(sdk.Username, sdk.Password, sdk.BaseUrl)
-		if err != nil {
-			return 401, nil, err
-		}
-		sdk.AccessToken = token.AccessToken
-		return get(endpoint, filter, sdk, false)
-	}
-
-	if response.StatusCode >= 400 {
-		var e Error
-		if err := json.Unmarshal(body, &e); err != nil {
-			log.Println("No valid JSON body:", err)
-			return response.StatusCode, nil, err
-		}
-		logError(e)
-		return response.StatusCode, nil, e
-	}
-	return response.StatusCode, body, err
+type IdBody struct {
+	Id uint `json:"id"`
 }
 
-func Get(endpoint string, filter map[string]string, sdk *SDK) (int, []byte, error) {
-	return get(endpoint, filter, sdk, true)
+type NewCallback struct {
+	Url           string `json:"url"`
+	ApplicationId uint   `json:"application_id"`
+	SharedSecret  string `json:"shared_secret"`
 }
 
-func requestPayload(endpoint string, content []byte, sdk *SDK, retry bool, method string) (int, []byte, error) {
-	uri := sdk.BaseUrl + endpoint
-
-	request, err := http.NewRequest(method, uri, bytes.NewBuffer(content))
-	if err != nil {
-		return 0, []byte{}, err
-	}
-	request.Header.Set("Authorization", "Bearer "+sdk.AccessToken)
-	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-	client := http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		log.Println(fmt.Sprintf("Error performing '%s %s' request:", method, uri), err)
-		return 0, []byte{}, err
-	}
-
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Println("Unexpected error while closing response buffer:", err)
-		}
-	}(response.Body)
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		log.Println("Read all of response body failed:", err)
-		return response.StatusCode, []byte{}, err
-	}
-
-	if response.StatusCode == 401 && retry {
-		log.Println("Invalid login token, trying to refresh...")
-		token, err := GetLoginToken(sdk.Username, sdk.Password, sdk.BaseUrl)
-		if err != nil {
-			return 401, []byte{}, err
-		}
-		sdk.AccessToken = token.AccessToken
-		return requestPayload(endpoint, content, sdk, false, method)
-	}
-
-	if response.StatusCode >= 400 {
-		var e Error
-		if err := json.Unmarshal(body, &e); err != nil {
-			log.Println("No valid JSON body:", err)
-			return response.StatusCode, nil, err
-		}
-		logError(e)
-		return response.StatusCode, nil, e
-	}
-	return response.StatusCode, body, err
+type NewAlias struct {
+	UserId        uint   `json:"user_id"`
+	ApplicationId uint   `json:"application_id"`
+	Username      string `json:"username"`
+	Confirmed     bool   `json:"confirmed"`
 }
 
-func Post(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
-	return requestPayload(endpoint, content, sdk, true, "POST")
+type NewTransaction struct {
+	Sender   any    `json:"sender"`
+	Receiver any    `json:"receiver"`
+	Amount   uint   `json:"amount"`
+	Reason   string `json:"reason"`
 }
 
-func Delete(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
-	return requestPayload(endpoint, content, sdk, true, "DELETE")
+type NewConsumption struct {
+	User       any    `json:"user"`
+	Amount     uint   `json:"amount"`
+	Consumable string `json:"consumable"`
+}
+
+type NewCommunism struct {
+	Amount      uint   `json:"amount"`
+	Description string `json:"description"`
+	Creator     any    `json:"creator"`
+}
+
+type NewPoll struct {
+	User    any    `json:"user"`
+	Issuer  any    `json:"issuer"`
+	Variant string `json:"variant"`
+}
+
+type NewRefund struct {
+	Amount      uint   `json:"amount"`
+	Description string `json:"description"`
+	Creator     any    `json:"creator"`
+}
+
+type NewVote struct {
+	User     any  `json:"user"`
+	BallotId uint `json:"ballot_id"`
+	Vote     bool `json:"vote"`
+}
+
+type IssuerIdBody struct {
+	Id     uint `json:"id"`
+	Issuer any  `json:"issuer"`
+}
+
+type UserPrivilegeDrop struct {
+	User   any `json:"user"`
+	Issuer any `json:"issuer"`
+}
+
+type VoucherUpdateRequest struct {
+	Debtor  any `json:"debtor"`
+	Voucher any `json:"voucher"`
+}
+
+type CommunismParticipationUpdate struct {
+	Id   uint `json:"id"`
+	User any  `json:"user"`
 }
