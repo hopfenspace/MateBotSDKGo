@@ -201,263 +201,80 @@ func (sdk *SDK) NewUser() (User, error) {
 	return user, err
 }
 
-func (sdk *SDK) DropInternalOfUserIDByIssuerName(userID int, issuer *string) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserIssuerName{
-		User:   userID,
+func (sdk *SDK) DropInternalPrivilege(user any, issuer any) (User, error) {
+	result := User{}
+	err := checkStrOrPosInt(user, false)
+	if err != nil {
+		return result, err
+	}
+	err = checkStrOrPosInt(issuer, true)
+	if err != nil {
+		return result, err
+	}
+
+	content, err := json.Marshal(internal.UserPrivilegeDrop{
+		User:   user,
 		Issuer: issuer,
 	})
 	if err != nil {
-		return user, err
+		return result, err
 	}
 
 	_, body, err := Post("/v1/users/dropInternal", content, sdk)
 	if err != nil {
-		return user, err
+		return result, err
 	}
 
-	if err = json.Unmarshal(body, &user); err != nil {
+	if err = json.Unmarshal(body, &result); err != nil {
 		log.Println("No valid JSON body:", err)
-		return user, err
+		return result, err
 	}
-	return user, err
+	return result, err
 }
 
-func (sdk *SDK) DropInternalOfUserIDByIssuerID(userID int, issuerID *int) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserIssuer{
-		User:   userID,
-		Issuer: issuerID,
-	})
+func (sdk *SDK) DropPermissionPrivilege(user any, issuer any) (User, error) {
+	result := User{}
+	err := checkStrOrPosInt(user, false)
 	if err != nil {
-		return user, err
+		return result, err
 	}
-
-	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	err = checkStrOrPosInt(issuer, true)
 	if err != nil {
-		return user, err
+		return result, err
 	}
 
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DropInternalOfUserNameByIssuerName(username string, issuer *string) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserNameIssuerName{
-		User:   username,
+	content, err := json.Marshal(internal.UserPrivilegeDrop{
+		User:   user,
 		Issuer: issuer,
 	})
 	if err != nil {
-		return user, err
-	}
-
-	_, body, err := Post("/v1/users/dropInternal", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DropInternalOfUserNameByIssuerID(username string, issuerID *int) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserNameIssuer{
-		User:   username,
-		Issuer: issuerID,
-	})
-	if err != nil {
-		return user, err
-	}
-
-	_, body, err := Post("/v1/users/dropInternal", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DropPermissionOfUserIDByIssuerName(userID int, issuer *string) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserIssuerName{
-		User:   userID,
-		Issuer: issuer,
-	})
-	if err != nil {
-		return user, err
+		return result, err
 	}
 
 	_, body, err := Post("/v1/users/dropPermission", content, sdk)
 	if err != nil {
-		return user, err
+		return result, err
 	}
 
-	if err = json.Unmarshal(body, &user); err != nil {
+	if err = json.Unmarshal(body, &result); err != nil {
 		log.Println("No valid JSON body:", err)
-		return user, err
+		return result, err
 	}
-	return user, err
+	return result, err
 }
 
-func (sdk *SDK) DropPermissionOfUserIDByIssuerID(userID int, issuerID *int) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserIssuer{
-		User:   userID,
-		Issuer: issuerID,
-	})
-	if err != nil {
-		return user, err
-	}
-
-	_, body, err := Post("/v1/users/dropPermission", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DropPermissionOfUserNameByIssuerName(username string, issuer *string) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserNameIssuerName{
-		User:   username,
-		Issuer: issuer,
-	})
-	if err != nil {
-		return user, err
-	}
-
-	_, body, err := Post("/v1/users/dropPermission", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DropPermissionOfUserNameByIssuerID(username string, issuerID *int) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateUserNameIssuer{
-		User:   username,
-		Issuer: issuerID,
-	})
-	if err != nil {
-		return user, err
-	}
-
-	_, body, err := Post("/v1/users/dropPermission", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) SetVoucherIDForDebtorID(debtorID int, voucherID *int) (VoucherUpdate, error) {
+func (sdk *SDK) SetVoucher(debtor any, voucher any) (VoucherUpdate, error) {
 	update := VoucherUpdate{}
-	content, err := json.Marshal(struct {
-		Debtor  int  `json:"debtor"`
-		Voucher *int `json:"voucher"`
-	}{
-		Debtor:  debtorID,
-		Voucher: voucherID,
-	})
+	err := checkStrOrPosInt(debtor, false)
+	if err != nil {
+		return update, err
+	}
+	err = checkStrOrPosInt(voucher, true)
 	if err != nil {
 		return update, err
 	}
 
-	_, body, err := Post("/v1/users/setVoucher", content, sdk)
-	if err != nil {
-		return update, err
-	}
-
-	if err = json.Unmarshal(body, &update); err != nil {
-		log.Println("No valid JSON body:", err)
-		return update, err
-	}
-	return update, err
-}
-
-func (sdk *SDK) SetVoucherNameForDebtorID(debtorID int, voucher *string) (VoucherUpdate, error) {
-	update := VoucherUpdate{}
-	content, err := json.Marshal(struct {
-		Debtor  int     `json:"debtor"`
-		Voucher *string `json:"voucher"`
-	}{
-		Debtor:  debtorID,
-		Voucher: voucher,
-	})
-	if err != nil {
-		return update, err
-	}
-
-	_, body, err := Post("/v1/users/setVoucher", content, sdk)
-	if err != nil {
-		return update, err
-	}
-
-	if err = json.Unmarshal(body, &update); err != nil {
-		log.Println("No valid JSON body:", err)
-		return update, err
-	}
-	return update, err
-}
-
-func (sdk *SDK) SetVoucherIDForDebtorName(debtor string, voucherID *int) (VoucherUpdate, error) {
-	update := VoucherUpdate{}
-	content, err := json.Marshal(struct {
-		Debtor  string `json:"debtor"`
-		Voucher *int   `json:"voucher"`
-	}{
-		Debtor:  debtor,
-		Voucher: voucherID,
-	})
-	if err != nil {
-		return update, err
-	}
-
-	_, body, err := Post("/v1/users/setVoucher", content, sdk)
-	if err != nil {
-		return update, err
-	}
-
-	if err = json.Unmarshal(body, &update); err != nil {
-		log.Println("No valid JSON body:", err)
-		return update, err
-	}
-	return update, err
-}
-
-func (sdk *SDK) SetVoucherNameForDebtorName(debtor string, voucher *string) (VoucherUpdate, error) {
-	update := VoucherUpdate{}
-	content, err := json.Marshal(struct {
-		Debtor  string  `json:"debtor"`
-		Voucher *string `json:"voucher"`
-	}{
+	content, err := json.Marshal(internal.VoucherUpdateRequest{
 		Debtor:  debtor,
 		Voucher: voucher,
 	})
@@ -477,33 +294,16 @@ func (sdk *SDK) SetVoucherNameForDebtorName(debtor string, voucher *string) (Vou
 	return update, err
 }
 
-func (sdk *SDK) DeleteUserByIssuerName(userID int, issuer string) (User, error) {
+func (sdk *SDK) DeleteUser(userID uint, issuer any) (User, error) {
 	user := User{}
-	content, err := json.Marshal(internal.UpdateIdIssuerName{
-		Id:         userID,
-		IssuerName: issuer,
-	})
+	err := checkStrOrPosInt(issuer, false)
 	if err != nil {
 		return user, err
 	}
 
-	_, body, err := Post("/v1/users/delete", content, sdk)
-	if err != nil {
-		return user, err
-	}
-
-	if err = json.Unmarshal(body, &user); err != nil {
-		log.Println("No valid JSON body:", err)
-		return user, err
-	}
-	return user, err
-}
-
-func (sdk *SDK) DeleteUserByIssuerID(userID int, issuerID int) (User, error) {
-	user := User{}
-	content, err := json.Marshal(internal.UpdateIdIssuer{
+	content, err := json.Marshal(internal.IssuerIdBody{
 		Id:     userID,
-		Issuer: issuerID,
+		Issuer: issuer,
 	})
 	if err != nil {
 		return user, err
@@ -563,11 +363,16 @@ func (sdk *SDK) NewUserWithAlias(username string) (User, error) {
 	return users[0], err
 }
 
-func (sdk *SDK) ConfirmAliasByIssuerName(aliasID int, issuer string) (Alias, error) {
+func (sdk *SDK) ConfirmAlias(aliasID uint, issuer any) (Alias, error) {
 	alias := Alias{}
-	content, err := json.Marshal(internal.UpdateIdIssuerName{
-		Id:         aliasID,
-		IssuerName: issuer,
+	err := checkStrOrPosInt(issuer, false)
+	if err != nil {
+		return alias, err
+	}
+
+	content, err := json.Marshal(internal.IssuerIdBody{
+		Id:     aliasID,
+		Issuer: issuer,
 	})
 	if err != nil {
 		return alias, err
@@ -585,33 +390,16 @@ func (sdk *SDK) ConfirmAliasByIssuerName(aliasID int, issuer string) (Alias, err
 	return alias, err
 }
 
-func (sdk *SDK) ConfirmAliasByIssuerID(aliasID int, issuerID int) (Alias, error) {
-	alias := Alias{}
-	content, err := json.Marshal(internal.UpdateIdIssuer{
-		Id:     aliasID,
-		Issuer: issuerID,
-	})
-	if err != nil {
-		return alias, err
-	}
-
-	_, body, err := Post("/v1/aliases/confirm", content, sdk)
-	if err != nil {
-		return alias, err
-	}
-
-	if err = json.Unmarshal(body, &alias); err != nil {
-		log.Println("No valid JSON body:", err)
-		return alias, err
-	}
-	return alias, err
-}
-
-func (sdk *SDK) DeleteAliasByIssuerName(aliasID int, issuer string) (AliasDeletion, error) {
+func (sdk *SDK) DeleteAlias(aliasID uint, issuer any) (AliasDeletion, error) {
 	deletion := AliasDeletion{}
-	content, err := json.Marshal(internal.UpdateIdIssuerName{
-		Id:         aliasID,
-		IssuerName: issuer,
+	err := checkStrOrPosInt(issuer, false)
+	if err != nil {
+		return deletion, err
+	}
+
+	content, err := json.Marshal(internal.IssuerIdBody{
+		Id:     aliasID,
+		Issuer: issuer,
 	})
 	if err != nil {
 		return deletion, err
@@ -629,26 +417,65 @@ func (sdk *SDK) DeleteAliasByIssuerName(aliasID int, issuer string) (AliasDeleti
 	return deletion, err
 }
 
-func (sdk *SDK) DeleteAliasByIssuerID(aliasID int, issuerID int) (AliasDeletion, error) {
-	deletion := AliasDeletion{}
-	content, err := json.Marshal(internal.UpdateIdIssuer{
-		Id:     aliasID,
-		Issuer: issuerID,
+func (sdk *SDK) SendTransaction(sender any, receiver any, amount uint, reason string) (Transaction, error) {
+	transaction := Transaction{}
+	err := checkStrOrPosInt(sender, false)
+	if err != nil {
+		return transaction, err
+	}
+	err = checkStrOrPosInt(receiver, false)
+	if err != nil {
+		return transaction, err
+	}
+
+	content, err := json.Marshal(internal.NewTransaction{
+		Sender:   sender,
+		Receiver: receiver,
+		Amount:   amount,
+		Reason:   reason,
 	})
 	if err != nil {
-		return deletion, err
+		return transaction, err
 	}
 
-	_, body, err := Post("/v1/aliases/delete", content, sdk)
+	_, body, err := Post("/v1/transactions/send", content, sdk)
 	if err != nil {
-		return deletion, err
+		return transaction, err
 	}
 
-	if err = json.Unmarshal(body, &deletion); err != nil {
+	if err = json.Unmarshal(body, &transaction); err != nil {
 		log.Println("No valid JSON body:", err)
-		return deletion, err
+		return transaction, err
 	}
-	return deletion, err
+	return transaction, err
+}
+
+func (sdk *SDK) ConsumeTransaction(consumer any, amount uint, consumable string) (Transaction, error) {
+	transaction := Transaction{}
+	err := checkStrOrPosInt(consumer, false)
+	if err != nil {
+		return transaction, err
+	}
+
+	content, err := json.Marshal(internal.NewConsumption{
+		User:       consumer,
+		Amount:     amount,
+		Consumable: consumable,
+	})
+	if err != nil {
+		return transaction, err
+	}
+
+	_, body, err := Post("/v1/transactions/consume", content, sdk)
+	if err != nil {
+		return transaction, err
+	}
+
+	if err = json.Unmarshal(body, &transaction); err != nil {
+		log.Println("No valid JSON body:", err)
+		return transaction, err
+	}
+	return transaction, err
 }
 
 func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string) (Callback, error) {
