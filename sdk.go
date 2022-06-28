@@ -201,7 +201,7 @@ func (sdk *SDK) NewUser() (User, error) {
 	return user, err
 }
 
-func (sdk *SDK) DropInternalPrivilege(user any, issuer any) (User, error) {
+func (sdk *SDK) dropPrivilege(user any, issuer any, endpoint string) (User, error) {
 	result := User{}
 	err := checkStrOrPosInt(user, false)
 	if err != nil {
@@ -220,7 +220,7 @@ func (sdk *SDK) DropInternalPrivilege(user any, issuer any) (User, error) {
 		return result, err
 	}
 
-	_, body, err := Post("/v1/users/dropInternal", content, sdk)
+	_, body, err := Post(endpoint, content, sdk)
 	if err != nil {
 		return result, err
 	}
@@ -232,35 +232,12 @@ func (sdk *SDK) DropInternalPrivilege(user any, issuer any) (User, error) {
 	return result, err
 }
 
+func (sdk *SDK) DropInternalPrivilege(user any, issuer any) (User, error) {
+	return sdk.dropPrivilege(user, issuer, "/v1/users/dropInternal")
+}
+
 func (sdk *SDK) DropPermissionPrivilege(user any, issuer any) (User, error) {
-	result := User{}
-	err := checkStrOrPosInt(user, false)
-	if err != nil {
-		return result, err
-	}
-	err = checkStrOrPosInt(issuer, true)
-	if err != nil {
-		return result, err
-	}
-
-	content, err := json.Marshal(internal.UserPrivilegeDrop{
-		User:   user,
-		Issuer: issuer,
-	})
-	if err != nil {
-		return result, err
-	}
-
-	_, body, err := Post("/v1/users/dropPermission", content, sdk)
-	if err != nil {
-		return result, err
-	}
-
-	if err = json.Unmarshal(body, &result); err != nil {
-		log.Println("No valid JSON body:", err)
-		return result, err
-	}
-	return result, err
+	return sdk.dropPrivilege(user, issuer, "/v1/users/dropPermission")
 }
 
 func (sdk *SDK) SetVoucher(debtor any, voucher any) (VoucherUpdate, error) {
@@ -476,6 +453,104 @@ func (sdk *SDK) ConsumeTransaction(consumer any, amount uint, consumable string)
 		return transaction, err
 	}
 	return transaction, err
+}
+
+func (sdk *SDK) NewCommunism(creator any, amount uint, description string) (Communism, error) {
+	communism := Communism{}
+	err := checkStrOrPosInt(creator, false)
+	if err != nil {
+		return communism, err
+	}
+
+	content, err := json.Marshal(internal.NewCommunism{
+		Creator:     creator,
+		Amount:      amount,
+		Description: description,
+	})
+	if err != nil {
+		return communism, err
+	}
+
+	_, body, err := Post("/v1/communisms", content, sdk)
+	if err != nil {
+		return communism, err
+	}
+
+	if err = json.Unmarshal(body, &communism); err != nil {
+		log.Println("No valid JSON body:", err)
+		return communism, err
+	}
+	return communism, err
+}
+
+func (sdk *SDK) abortOrCloseCommunism(communismID uint, issuer any, endpoint string) (Communism, error) {
+	communism := Communism{}
+	err := checkStrOrPosInt(issuer, false)
+	if err != nil {
+		return communism, err
+	}
+
+	content, err := json.Marshal(internal.IssuerIdBody{
+		Id:     communismID,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return communism, err
+	}
+
+	_, body, err := Post(endpoint, content, sdk)
+	if err != nil {
+		return communism, err
+	}
+
+	if err = json.Unmarshal(body, &communism); err != nil {
+		log.Println("No valid JSON body:", err)
+		return communism, err
+	}
+	return communism, err
+}
+
+func (sdk *SDK) AbortCommunism(communismID uint, issuer any) (Communism, error) {
+	return sdk.abortOrCloseCommunism(communismID, issuer, "/v1/communisms/abort")
+}
+
+func (sdk *SDK) CloseCommunism(communismID uint, issuer any) (Communism, error) {
+	return sdk.abortOrCloseCommunism(communismID, issuer, "/v1/communisms/close")
+}
+
+func (sdk *SDK) changeCommunismParticipation(communismID uint, user any, endpoint string) (Communism, error) {
+	communism := Communism{}
+	err := checkStrOrPosInt(user, false)
+	if err != nil {
+		return communism, err
+	}
+
+	content, err := json.Marshal(internal.CommunismParticipationUpdate{
+		Id:   communismID,
+		User: user,
+	})
+	if err != nil {
+		return communism, err
+	}
+
+	_, body, err := Post(endpoint, content, sdk)
+	if err != nil {
+		return communism, err
+	}
+
+	if err = json.Unmarshal(body, &communism); err != nil {
+		log.Println("No valid JSON body:", err)
+		return communism, err
+	}
+	return communism, err
+}
+
+func (sdk *SDK) IncreaseCommunismParticipation(communismID uint, user any) (Communism, error) {
+	return sdk.changeCommunismParticipation(communismID, user, "/v1/communisms/increaseParticipation")
+}
+
+func (sdk *SDK) DecreaseCommunismParticipation(communismID uint, user any) (Communism, error) {
+	return sdk.changeCommunismParticipation(communismID, user, "/v1/communisms/decreaseParticipation")
 }
 
 func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string) (Callback, error) {
