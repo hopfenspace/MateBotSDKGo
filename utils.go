@@ -67,3 +67,37 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 func logError(error Error) {
 	log.Println(fmt.Sprintf("Error %d '%s %s': %s; %s", error.Status, error.Method, error.Request, error.Message, error.Details))
 }
+
+func checkStrOrPosInt(value any, allowNil bool) error {
+	switch value.(type) {
+	case nil:
+		if !allowNil {
+			return errors.New(fmt.Sprintf("invalid data type '%T', expected a string or unsigned/positive integer (>= 16 bits)", value))
+		}
+		return nil
+	case uint, uint16, uint32, uint64, string:
+		return nil
+	case int:
+		if v := value.(int); v < 0 {
+			return errors.New(fmt.Sprintf("invalid value of '%T', value %d must not be negative", value, value))
+		}
+		return nil
+	case int16:
+		if v := value.(int16); v < 0 {
+			return errors.New(fmt.Sprintf("invalid value of '%T', value %d must not be negative", value, value))
+		}
+		return nil
+	case int32:
+		if v := value.(int32); v < 0 {
+			return errors.New(fmt.Sprintf("invalid value of '%T', value %d must not be negative", value, value))
+		}
+		return nil
+	case int64:
+		if v := value.(int64); v < 0 {
+			return errors.New(fmt.Sprintf("invalid value of '%T', value %d must not be negative", value, value))
+		}
+		return nil
+	default:
+		return errors.New(fmt.Sprintf("invalid data type '%T', expected a string or unsigned/positive integer (>= 16 bits)", value))
+	}
+}

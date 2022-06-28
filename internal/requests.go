@@ -18,22 +18,22 @@ type NewAlias struct {
 }
 
 type NewTransaction struct {
-	Sender   int    `json:"sender"`
-	Receiver int    `json:"receiver"`
+	Sender   any    `json:"sender"`
+	Receiver any    `json:"receiver"`
 	Amount   uint   `json:"amount"`
 	Reason   string `json:"reason"`
+}
+
+type NewConsumption struct {
+	User       any    `json:"user"`
+	Amount     uint   `json:"amount"`
+	Consumable string `json:"consumable"`
 }
 
 type NewCommunism struct {
 	Amount      uint   `json:"amount"`
 	Description string `json:"description"`
-	Creator     uint   `json:"creator"`
-}
-
-type NewConsumption struct {
-	User       uint   `json:"user"`
-	Amount     uint   `json:"amount"`
-	Consumable string `json:"consumable"`
+	Creator     any    `json:"creator"`
 }
 
 type NewPoll struct {
@@ -54,37 +54,22 @@ type NewVote struct {
 	Vote     bool `json:"vote"`
 }
 
-type UpdateIdIssuer struct {
-	Id     int `json:"id"`
-	Issuer int `json:"issuer"`
+type IssuerIdBody struct {
+	Id     uint `json:"id"`
+	Issuer any  `json:"issuer"`
 }
 
-type UpdateIdIssuerName struct {
-	Id         int    `json:"id"`
-	IssuerName string `json:"issuer"`
+type UserPrivilegeDrop struct {
+	User   any `json:"user"`
+	Issuer any `json:"issuer"`
 }
 
-type UpdateIdUser struct {
-	Id   int `json:"id"`
-	User int `json:"user"`
+type VoucherUpdateRequest struct {
+	Debtor  any `json:"debtor"`
+	Voucher any `json:"voucher"`
 }
 
-type UpdateUserIssuer struct {
-	User   int  `json:"user"`
-	Issuer *int `json:"issuer"`
-}
-
-type UpdateUserNameIssuer struct {
-	User   string `json:"user"`
-	Issuer *int   `json:"issuer"`
-}
-
-type UpdateUserIssuerName struct {
-	User   int     `json:"user"`
-	Issuer *string `json:"issuer"`
-}
-
-type UpdateUserNameIssuerName struct {
-	User   string  `json:"user"`
-	Issuer *string `json:"issuer"`
+type CommunismParticipationUpdate struct {
+	Id   uint `json:"id"`
+	User any  `json:"user"`
 }
