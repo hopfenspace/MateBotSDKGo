@@ -4,14 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 )
 
-func GetLoginToken(username string, password string, baseURL string) (Token, error) {
-	token := Token{}
+func GetLoginToken(username string, password string, baseURL string) (*Token, error) {
 	for baseURL[len(baseURL)-1] == '/' {
 		baseURL = baseURL[:len(baseURL)-1]
 	}
@@ -21,7 +19,7 @@ func GetLoginToken(username string, password string, baseURL string) (Token, err
 		url.Values{"username": {username}, "password": {password}, "grant_type": {"password"}, "scope": {""}, "client_id": {""}, "client_secret": {""}})
 	if err != nil {
 		log.Println("Failed to connect to API server:", err)
-		return token, err
+		return nil, err
 	}
 
 	if response != nil {
@@ -34,28 +32,29 @@ func GetLoginToken(username string, password string, baseURL string) (Token, err
 	} else {
 		err = errors.New("response body is null")
 		log.Println("Failed to access body:", err)
-		return token, err
+		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		log.Println("Read all of response body failed:", err)
-		return token, err
+		return nil, err
 	}
 
 	if response.StatusCode == 200 {
+		var token *Token
 		if err = json.Unmarshal(body, &token); err != nil {
 			log.Println("No valid JSON body:", err)
-			return token, err
+			return nil, err
 		}
 		return token, err
 	} else {
-		e := Error{}
+		var e Error
 		if err = json.Unmarshal(body, &e); err != nil {
 			log.Println("No valid JSON body: err")
-			return token, err
+			return nil, err
 		}
 		logError(e)
-		return token, e
+		return nil, e
 	}
 }
