@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func New(baseURL string, username string, password string, callbackURL *string, callbackSecret *string) (*SDK, error) {
+func New(baseURL string, username string, password string, callbackURL *string, callbackSecret *string, currencyDigits uint, currencyFactor uint, currencySymbol string) (*SDK, error) {
 	if (callbackURL != nil && callbackSecret == nil) || (callbackURL == nil && callbackSecret != nil) {
 		return nil, errors.New("options 'callbackURL' and 'callbackSecret' must both be set or omitted")
 	}
@@ -16,9 +16,12 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 		baseURL = baseURL[:len(baseURL)-1]
 	}
 	sdk := SDK{
-		BaseUrl:  baseURL,
-		Username: username,
-		Password: password,
+		BaseUrl:        baseURL,
+		Username:       username,
+		Password:       password,
+		CurrencyDigits: currencyDigits,
+		CurrencyFactor: currencyFactor,
+		CurrencySymbol: currencySymbol,
 	}
 
 	token, err := GetLoginToken(username, password, baseURL)

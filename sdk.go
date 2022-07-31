@@ -2,19 +2,28 @@ package MateBotSDKGo
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 )
 
 type SDK struct {
-	BaseUrl       string
-	Username      string
-	Password      string
-	ApplicationID uint
-	AccessToken   string
-	Callbacks     []*Callback
-	APIVersion    uint
-	ServerVersion VersionInfo
+	BaseUrl        string
+	Username       string
+	Password       string
+	ApplicationID  uint
+	AccessToken    string
+	Callbacks      []*Callback
+	APIVersion     uint
+	ServerVersion  VersionInfo
+	CurrencyDigits uint
+	CurrencyFactor uint
+	CurrencySymbol string
+}
+
+func (sdk *SDK) FormatBalance(balance int) string {
+	v := float64(balance) / float64(sdk.CurrencyFactor)
+	return fmt.Sprintf("%."+strconv.Itoa(int(sdk.CurrencyDigits))+"f%s", v, sdk.CurrencySymbol)
 }
 
 func (sdk *SDK) GetStatus() (*Status, error) {
