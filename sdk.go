@@ -232,6 +232,10 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 		users, err := sdk.GetUsers(filter)
 		if err != nil {
 			return nil, err
+		} else if len(users) < 1 {
+			return nil, errors.New("no user found")
+		} else if len(users) > 1 {
+			return nil, errors.New("ambiguous username")
 		}
 		return users[0], nil
 	case string:
