@@ -9,17 +9,19 @@ import (
 )
 
 type SDK struct {
-	BaseUrl        string
-	Username       string
-	Password       string
-	ApplicationID  uint
-	AccessToken    string
-	Callbacks      []*Callback
-	APIVersion     uint
-	ServerVersion  VersionInfo
-	CurrencyDigits uint
-	CurrencyFactor uint
-	CurrencySymbol string
+	BaseUrl           string
+	Username          string
+	Password          string
+	ApplicationID     uint
+	AccessToken       string
+	Callbacks         []*Callback
+	APIVersion        uint
+	ServerVersion     VersionInfo
+	CurrencyDigits    uint
+	CurrencyFactor    uint
+	CurrencySymbol    string
+	CommunityUserID   uint
+	CommunityUsername *string
 }
 
 func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, error)) (string, error) {

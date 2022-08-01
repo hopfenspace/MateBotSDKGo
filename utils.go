@@ -64,6 +64,18 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 		}
 		sdk.Callbacks = callbacks
 	}
+
+	communityUsers, err := sdk.GetUsers(map[string]string{"community": "true"})
+	if err != nil {
+		return nil, err
+	}
+	sdk.CommunityUserID = communityUsers[0].Id
+	for _, alias := range communityUsers[0].Aliases {
+		if alias.Confirmed && alias.ApplicationId == sdk.ApplicationID {
+			sdk.CommunityUsername = &alias.Username
+		}
+	}
+
 	return &sdk, err
 }
 
