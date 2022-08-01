@@ -215,7 +215,7 @@ func (sdk *SDK) GetVotes(filter map[string]string) ([]*Vote, error) {
 	return votes, err
 }
 
-func (sdk *SDK) GetUser(userIdOrUsername any) (*User, error) {
+func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (*User, error) {
 	err := checkStrOrPosInt(userIdOrUsername, false)
 	if err != nil {
 		return nil, err
@@ -223,13 +223,30 @@ func (sdk *SDK) GetUser(userIdOrUsername any) (*User, error) {
 
 	switch userIdOrUsername.(type) {
 	case int, int16, int32, int64, uint, uint16, uint32, uint64:
-		users, err := sdk.GetUsers(map[string]string{"active": "true", "id": strconv.Itoa(userIdOrUsername.(int))})
+		filter := map[string]string{"active": "true", "id": strconv.Itoa(userIdOrUsername.(int))}
+		if extendedFilter != nil {
+			for k, v := range *extendedFilter {
+				filter[k] = v
+			}
+		}
+		users, err := sdk.GetUsers(filter)
 		if err != nil {
 			return nil, err
 		}
 		return users[0], nil
 	case string:
-		users, err := sdk.GetUsers(map[string]string{"active": "true", "alias_confirmed": "true", "alias_username": userIdOrUsername.(string), "alias_application_id": strconv.Itoa(int(sdk.ApplicationID))})
+		filter := map[string]string{
+			"active":               "true",
+			"alias_confirmed":      "true",
+			"alias_username":       userIdOrUsername.(string),
+			"alias_application_id": strconv.Itoa(int(sdk.ApplicationID)),
+		}
+		if extendedFilter != nil {
+			for k, v := range *extendedFilter {
+				filter[k] = v
+			}
+		}
+		users, err := sdk.GetUsers(filter)
 		if err != nil {
 			return nil, err
 		} else if len(users) < 1 {
