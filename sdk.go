@@ -215,6 +215,33 @@ func (sdk *SDK) GetVotes(filter map[string]string) ([]*Vote, error) {
 	return votes, err
 }
 
+func (sdk *SDK) GetUser(userIdOrUsername any) (*User, error) {
+	err := checkStrOrPosInt(userIdOrUsername, false)
+	if err != nil {
+		return nil, err
+	}
+
+	switch userIdOrUsername.(type) {
+	case int, int16, int32, int64, uint, uint16, uint32, uint64:
+		users, err := sdk.GetUsers(map[string]string{"active": "true", "id": strconv.Itoa(userIdOrUsername.(int))})
+		if err != nil {
+			return nil, err
+		}
+		return users[0], nil
+	case string:
+		users, err := sdk.GetUsers(map[string]string{"active": "true", "alias_confirmed": "true", "alias_username": userIdOrUsername.(string), "alias_application_id": strconv.Itoa(int(sdk.ApplicationID))})
+		if err != nil {
+			return nil, err
+		} else if len(users) < 1 {
+			return nil, errors.New("no user found")
+		} else if len(users) > 1 {
+			return nil, errors.New("ambiguous username")
+		}
+		return users[0], nil
+	}
+	return nil, errors.New("invalid")
+}
+
 func (sdk *SDK) abortSomething(obj uint, issuer any, endpoint string) ([]byte, error) {
 	err := checkStrOrPosInt(issuer, false)
 	if err != nil {
