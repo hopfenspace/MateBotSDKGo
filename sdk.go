@@ -263,6 +263,21 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 	return nil, errors.New("invalid")
 }
 
+func (sdk *SDK) GetCommunityBalance(issuer *User) (int, error) {
+	if issuer == nil {
+		return 0, errors.New("invalid user account")
+	} else if !issuer.Active {
+		return 0, errors.New("this user account has been disabled")
+	} else if issuer.External {
+		return 0, errors.New("you don't have the permission to request this information")
+	}
+	community, err := sdk.GetUser(sdk.CommunityUserID, &map[string]string{"community": "true"})
+	if err != nil {
+		return 0, err
+	}
+	return community.Balance, nil
+}
+
 func (sdk *SDK) abortSomething(obj uint, issuer any, endpoint string) ([]byte, error) {
 	err := checkStrOrPosInt(issuer, false)
 	if err != nil {
