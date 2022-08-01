@@ -22,9 +22,9 @@ type SDK struct {
 	CurrencySymbol string
 }
 
-func (sdk *SDK) FormatUsername(user *User, findUsername *func(int) (string, error)) (string, error) {
+func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, error)) (string, error) {
 	if findUsername != nil {
-		username, err := (*findUsername)(int(user.Id))
+		username, err := (*findUsername)(user.Id)
 		if err == nil {
 			return username, nil
 		}
