@@ -221,23 +221,12 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 		return nil, err
 	}
 
+	var userId int
 	switch userIdOrUsername.(type) {
-	case int, int16, int32, int64, uint, uint16, uint32, uint64:
-		filter := map[string]string{"active": "true", "id": strconv.Itoa(userIdOrUsername.(int))}
-		if extendedFilter != nil {
-			for k, v := range *extendedFilter {
-				filter[k] = v
-			}
-		}
-		users, err := sdk.GetUsers(filter)
-		if err != nil {
-			return nil, err
-		} else if len(users) < 1 {
-			return nil, errors.New("no user found")
-		} else if len(users) > 1 {
-			return nil, errors.New("ambiguous username")
-		}
-		return users[0], nil
+	case uint, uint16, uint32, uint64:
+		userId = int(userIdOrUsername.(uint))
+	case int, int16, int32, int64:
+		userId = userIdOrUsername.(int)
 	case string:
 		filter := map[string]string{
 			"active":               "true",
@@ -259,8 +248,25 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 			return nil, errors.New("ambiguous username")
 		}
 		return users[0], nil
+	default:
+		return nil, errors.New("invalid")
 	}
-	return nil, errors.New("invalid")
+
+	filter := map[string]string{"active": "true", "id": strconv.Itoa(userId)}
+	if extendedFilter != nil {
+		for k, v := range *extendedFilter {
+			filter[k] = v
+		}
+	}
+	users, err := sdk.GetUsers(filter)
+	if err != nil {
+		return nil, err
+	} else if len(users) < 1 {
+		return nil, errors.New("no user found")
+	} else if len(users) > 1 {
+		return nil, errors.New("ambiguous username")
+	}
+	return users[0], nil
 }
 
 func (sdk *SDK) GetCommunityBalance(issuer *User) (int, error) {
