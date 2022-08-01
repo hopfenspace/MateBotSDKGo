@@ -2,6 +2,7 @@ package MateBotSDKGo
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -19,6 +20,21 @@ type SDK struct {
 	CurrencyDigits uint
 	CurrencyFactor uint
 	CurrencySymbol string
+}
+
+func (sdk *SDK) FormatUsername(user *User, findUsername *func(int) (string, error)) (string, error) {
+	if findUsername != nil {
+		username, err := (*findUsername)(int(user.Id))
+		if err == nil {
+			return username, nil
+		}
+	}
+	for _, alias := range user.Aliases {
+		if alias.ApplicationId == sdk.ApplicationID && alias.Confirmed {
+			return alias.Username, nil
+		}
+	}
+	return fmt.Sprintf("User %d", user.Id), errors.New("no results")
 }
 
 func (sdk *SDK) FormatBalance(balance int) string {
