@@ -36,6 +36,9 @@ func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, err
 			return alias.Username, nil
 		}
 	}
+	if user.Id == sdk.CommunityUserID {
+		return "Community", nil
+	}
 	return fmt.Sprintf("User %d", user.Id), errors.New("no results")
 }
 
