@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sort"
 	"strconv"
 )
 
@@ -265,6 +266,26 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 		return nil, errors.New("no user found")
 	} else if len(users) > 1 {
 		return nil, errors.New("ambiguous username")
+	}
+	return users[0], nil
+}
+
+func (sdk *SDK) FindSponsoringUser(issuer *User) (*User, error) {
+	if issuer == nil {
+		return nil, errors.New("invalid user account")
+	} else if !issuer.Active {
+		return nil, errors.New("this user account has been disabled")
+	} else if issuer.External {
+		return nil, errors.New("you don't have the permission to request this information")
+	}
+
+	users, err := sdk.GetUsers(map[string]string{"community": "false", "active": "true"})
+	if err != nil {
+		return nil, err
+	}
+	sort.Slice(users, func(i int, j int) bool { return users[i].Balance < users[j].Balance })
+	if users[0].Balance >= 0 {
+		return nil, nil
 	}
 	return users[0], nil
 }
