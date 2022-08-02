@@ -26,6 +26,9 @@ type SDK struct {
 }
 
 func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, error)) (string, error) {
+	if user == nil {
+		return "Unknown user", errors.New("invalid user")
+	}
 	if findUsername != nil {
 		username, err := (*findUsername)(user.Id)
 		if err == nil {
