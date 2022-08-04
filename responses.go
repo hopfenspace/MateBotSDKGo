@@ -211,9 +211,30 @@ type RefundVote struct {
 	Vote   Vote   `json:"vote"`
 }
 
+type EventType string
+
+const (
+	ServerStarted              EventType = "server_started"
+	AliasConfirmationRequested           = "alias_confirmation_requested"
+	AliasConfirmed                       = "alias_confirmed"
+	CommunismCreated                     = "communism_created"
+	CommunismUpdated                     = "communism_updated"
+	CommunismClosed                      = "communism_closed"
+	PollCreated                          = "poll_created"
+	PollUpdated                          = "poll_updated"
+	PollClosed                           = "poll_closed"
+	RefundCreated                        = "refund_created"
+	RefundUpdated                        = "refund_updated"
+	RefundClosed                         = "refund_closed"
+	TransactionCreated                   = "transaction_created"
+	VoucherUpdated                       = "voucher_updated"
+	UserSoftlyDeleted                    = "user_softly_deleted"
+	UserUpdated                          = "user_updated"
+)
+
 type Event struct {
-	Event     string `json:"event"`
-	Timestamp int    `json:"timestamp"`
+	Event     EventType `json:"event"`
+	Timestamp int       `json:"timestamp"`
 	Data      struct{}
 }
 
