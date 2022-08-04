@@ -82,6 +82,34 @@ type User struct {
 	Modified   uint    `json:"modified"`
 }
 
+type PrivilegeLevel uint8
+
+const (
+	Disabled PrivilegeLevel = iota
+	External
+	Vouched
+	Internal
+	Permitted
+)
+
+func (u *User) Privilege() PrivilegeLevel {
+	if !u.Active {
+		return Disabled
+	}
+	if u.External {
+		if u.VoucherId == nil {
+			return External
+		} else {
+			return Vouched
+		}
+	}
+	if !u.Permission {
+		return Internal
+	} else {
+		return Permitted
+	}
+}
+
 type Transaction struct {
 	Id                 uint    `json:"id"`
 	Sender             User    `json:"sender"`
