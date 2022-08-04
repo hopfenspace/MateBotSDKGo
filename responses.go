@@ -165,17 +165,26 @@ type Vote struct {
 	Modified uint `json:"modified"`
 }
 
+type PollVariant string
+
+const (
+	GetInternal     PollVariant = "get_internal"
+	LooseInternal               = "loose_internal"
+	GetPermission               = "get_permission"
+	LoosePermission             = "loose_permission"
+)
+
 type Poll struct {
-	Id        uint   `json:"id"`
-	Active    bool   `json:"active"`
-	Accepted  *bool  `json:"accepted"`
-	Variant   string `json:"variant"`
-	User      User   `json:"user"`
-	CreatorId uint   `json:"creator_id"`
-	BallotId  uint   `json:"ballot_id"`
-	Votes     []Vote `json:"votes"`
-	Created   uint   `json:"created"`
-	Modified  uint   `json:"modified"`
+	Id        uint        `json:"id"`
+	Active    bool        `json:"active"`
+	Accepted  *bool       `json:"accepted"`
+	Variant   PollVariant `json:"variant"`
+	User      User        `json:"user"`
+	CreatorId uint        `json:"creator_id"`
+	BallotId  uint        `json:"ballot_id"`
+	Votes     []Vote      `json:"votes"`
+	Created   uint        `json:"created"`
+	Modified  uint        `json:"modified"`
 }
 
 type PollVote struct {
