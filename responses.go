@@ -173,3 +173,14 @@ type RefundVote struct {
 	Refund Refund `json:"refund"`
 	Vote   Vote   `json:"vote"`
 }
+
+type Event struct {
+	Event     string `json:"event"`
+	Timestamp int    `json:"timestamp"`
+	Data      struct{}
+}
+
+type EventsNotification struct {
+	Number int     `json:"number"`
+	Events []Event `json:"events"`
+}
