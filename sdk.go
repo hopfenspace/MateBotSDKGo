@@ -18,9 +18,7 @@ type SDK struct {
 	Callbacks         []*Callback
 	APIVersion        uint
 	ServerVersion     VersionInfo
-	CurrencyDigits    uint
-	CurrencyFactor    uint
-	CurrencySymbol    string
+	Currency          Currency
 	CommunityUserID   uint
 	CommunityUsername *string
 }
@@ -47,8 +45,8 @@ func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, err
 }
 
 func (sdk *SDK) FormatBalance(balance int) string {
-	v := float64(balance) / float64(sdk.CurrencyFactor)
-	return fmt.Sprintf("%."+strconv.Itoa(int(sdk.CurrencyDigits))+"f%s", v, sdk.CurrencySymbol)
+	v := float64(balance) / float64(sdk.Currency.Factor)
+	return fmt.Sprintf("%."+strconv.Itoa(int(sdk.Currency.Digits))+"f%s", v, sdk.Currency.Symbol)
 }
 
 func (sdk *SDK) GetStatus() (*Status, error) {

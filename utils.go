@@ -7,24 +7,38 @@ import (
 	"strconv"
 )
 
-func New(baseURL string, username string, password string, callbackURL *string, callbackSecret *string, currencyDigits uint, currencyFactor uint, currencySymbol string) (*SDK, error) {
-	if (callbackURL != nil && callbackSecret == nil) || (callbackURL == nil && callbackSecret != nil) {
-		return nil, errors.New("options 'callbackURL' and 'callbackSecret' must both be set or omitted")
+type Config struct {
+	BaseUrl        string
+	Username       string
+	Password       string
+	CallbackUrl    *string
+	CallbackSecret *string
+	Currency       Currency
+}
+
+type Currency struct {
+	Digits uint
+	Factor uint
+	Symbol string
+}
+
+func New(conf *Config) (*SDK, error) {
+	if (conf.CallbackUrl != nil && conf.CallbackSecret == nil) || (conf.CallbackUrl == nil && conf.CallbackSecret != nil) {
+		return nil, errors.New("options 'CallbackUrl' and 'CallbackSecret' must both be set or omitted")
 	}
 
-	for baseURL[len(baseURL)-1] == '/' {
-		baseURL = baseURL[:len(baseURL)-1]
+	baseUrl := conf.BaseUrl
+	for baseUrl[len(baseUrl)-1] == '/' {
+		baseUrl = baseUrl[:len(baseUrl)-1]
 	}
 	sdk := SDK{
-		BaseUrl:        baseURL,
-		Username:       username,
-		Password:       password,
-		CurrencyDigits: currencyDigits,
-		CurrencyFactor: currencyFactor,
-		CurrencySymbol: currencySymbol,
+		BaseUrl:  baseUrl,
+		Username: conf.Username,
+		Password: conf.Password,
+		Currency: conf.Currency,
 	}
 
-	token, err := GetLoginToken(username, password, baseURL)
+	token, err := GetLoginToken(conf.Username, conf.Password, conf.BaseUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +59,7 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 	}
 	sdk.ApplicationID = apps[0].Id
 
-	if callbackURL != nil {
+	if conf.CallbackUrl != nil {
 		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
 		if err != nil {
 			return nil, err
@@ -55,7 +69,7 @@ func New(baseURL string, username string, password string, callbackURL *string, 
 				return nil, err
 			}
 		}
-		if _, err := sdk.NewCallback(*callbackURL, sdk.ApplicationID, *callbackSecret); err != nil {
+		if _, err := sdk.NewCallback(*conf.CallbackUrl, sdk.ApplicationID, *conf.CallbackSecret); err != nil {
 			return nil, err
 		}
 		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
