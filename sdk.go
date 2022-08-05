@@ -380,17 +380,21 @@ func (sdk *SDK) DropPermissionPrivilege(user any, issuer any) (*User, error) {
 	return sdk.dropPrivilege(user, issuer, "/v1/users/dropPermission")
 }
 
-func (sdk *SDK) SetVoucher(debtor any, voucher any) (*VoucherUpdate, error) {
+func (sdk *SDK) SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, error) {
 	if err := checkStrOrPosInt(debtor, false); err != nil {
 		return nil, err
 	}
 	if err := checkStrOrPosInt(voucher, true); err != nil {
 		return nil, err
 	}
+	if err := checkStrOrPosInt(issuer, false); err != nil {
+		return nil, err
+	}
 
 	content, err := json.Marshal(VoucherUpdateRequest{
 		Debtor:  debtor,
 		Voucher: voucher,
+		Issuer:  issuer,
 	})
 	if err != nil {
 		return nil, err

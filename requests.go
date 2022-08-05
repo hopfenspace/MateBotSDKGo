@@ -67,6 +67,7 @@ type UserPrivilegeDrop struct {
 type VoucherUpdateRequest struct {
 	Debtor  any `json:"debtor"`
 	Voucher any `json:"voucher"`
+	Issuer  any `json:"issuer"`
 }
 
 type CommunismParticipationUpdate struct {
