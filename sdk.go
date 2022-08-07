@@ -437,15 +437,30 @@ func (sdk *SDK) DeleteUser(userID uint, issuer any) (*User, error) {
 	return user, err
 }
 
-func (sdk *SDK) NewAlias(userID uint, username string) (*Alias, error) {
-	content, err := json.Marshal(NewAlias{
-		UserId:        userID,
-		ApplicationId: sdk.ApplicationID,
-		Username:      username,
-		Confirmed:     false,
-	})
-	if err != nil {
-		return nil, err
+func (sdk *SDK) newAlias(userID uint, username string, confirmed *bool) (*Alias, error) {
+	var content []byte
+	if confirmed == nil {
+		if c, err := json.Marshal(NewAlias{
+			UserId:        userID,
+			ApplicationId: sdk.ApplicationID,
+			Username:      username,
+			Confirmed:     false,
+		}); err != nil {
+			return nil, err
+		} else {
+			content = c
+		}
+	} else {
+		if c, err := json.Marshal(NewAlias{
+			UserId:        userID,
+			ApplicationId: sdk.ApplicationID,
+			Username:      username,
+			Confirmed:     *confirmed,
+		}); err != nil {
+			return nil, err
+		} else {
+			content = c
+		}
 	}
 
 	_, body, err := Post("/v1/aliases", content, sdk)
@@ -461,13 +476,19 @@ func (sdk *SDK) NewAlias(userID uint, username string) (*Alias, error) {
 	return alias, err
 }
 
+func (sdk *SDK) NewAlias(userID uint, username string) (*Alias, error) {
+	c := false
+	return sdk.newAlias(userID, username, &c)
+}
+
 func (sdk *SDK) NewUserWithAlias(username string) (*User, error) {
 	user, err := sdk.NewUser()
 	if err != nil {
 		return nil, err
 	}
 
-	alias, err := sdk.NewAlias(user.Id, username)
+	c := true
+	alias, err := sdk.newAlias(user.Id, username, &c)
 	if err != nil {
 		return user, err
 	}
