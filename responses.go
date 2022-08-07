@@ -232,10 +232,30 @@ const (
 	UserUpdated                          = "user_updated"
 )
 
+// The EventData struct may contain any of the available fields, depending on the event type
+type EventData struct {
+	Id                  *uint        `json:"id"`
+	App                 *string      `json:"app"`
+	ServerBaseUrl       *string      `json:"base_url"`
+	TransactionSender   *uint        `json:"sender"`
+	TransactionReceiver *uint        `json:"receiver"`
+	Amount              *uint        `json:"amount"`
+	Transaction         *uint        `json:"transaction"`
+	Voucher             *uint        `json:"voucher"`
+	User                *uint        `json:"user"`
+	Participants        *uint        `json:"participants"`
+	Aborted             *bool        `json:"aborted"`
+	CountTransactions   *uint        `json:"transactions"`
+	CurrentBallotResult *int         `json:"current_result"`
+	LastBallotVote      *uint        `json:"last_vote"`
+	Accepted            *bool        `json:"accepted"`
+	PollVariant         *PollVariant `json:"variant"`
+}
+
 type Event struct {
 	Event     EventType `json:"event"`
 	Timestamp int       `json:"timestamp"`
-	Data      any       `json:"data"`
+	Data      EventData `json:"data"`
 }
 
 type EventsNotification struct {
