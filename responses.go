@@ -235,7 +235,7 @@ const (
 type Event struct {
 	Event     EventType `json:"event"`
 	Timestamp int       `json:"timestamp"`
-	Data      struct{}
+	Data      any       `json:"data"`
 }
 
 type EventsNotification struct {
