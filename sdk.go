@@ -488,11 +488,8 @@ func (sdk *SDK) NewUserWithAlias(username string) (*User, error) {
 	}
 
 	c := true
-	alias, err := sdk.newAlias(user.ID, username, &c)
+	_, err = sdk.newAlias(user.ID, username, &c)
 	if err != nil {
-		return user, err
-	}
-	if _, err := sdk.ConfirmAlias(alias.ID, user.ID); err != nil {
 		return user, err
 	}
 
