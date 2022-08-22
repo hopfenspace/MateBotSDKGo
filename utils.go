@@ -93,6 +93,17 @@ func New(conf *Config) (*SDK, error) {
 	return &sdk, err
 }
 
+func (sdk *SDK) Shutdown() error {
+	for _, callback := range sdk.Callbacks {
+		if *callback.ApplicationID == sdk.ApplicationID {
+			if success, err := sdk.DeleteCallback(callback.ID); err != nil || !success {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func logError(error Error) {
 	log.Println(fmt.Sprintf("Error %d '%s %s': %s; %s", error.Status, error.Method, error.Request, error.Message, error.Details))
 }
