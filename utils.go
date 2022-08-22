@@ -22,7 +22,7 @@ type Currency struct {
 	Symbol string
 }
 
-func New(conf *Config) (*SDK, error) {
+func New(conf *Config) (*sdk, error) {
 	if (conf.CallbackURL != nil && conf.CallbackSecret == nil) || (conf.CallbackURL == nil && conf.CallbackSecret != nil) {
 		return nil, errors.New("options 'CallbackURL' and 'CallbackSecret' must both be set or omitted")
 	}
@@ -31,10 +31,10 @@ func New(conf *Config) (*SDK, error) {
 	for baseUrl[len(baseUrl)-1] == '/' {
 		baseUrl = baseUrl[:len(baseUrl)-1]
 	}
-	sdk := SDK{
+	sdk := sdk{
 		BaseUrl:  baseUrl,
 		Username: conf.Username,
-		Password: conf.Password,
+		password: conf.Password,
 		Currency: conf.Currency,
 	}
 
@@ -42,14 +42,14 @@ func New(conf *Config) (*SDK, error) {
 	if err != nil {
 		return nil, err
 	}
-	sdk.AccessToken = token.AccessToken
+	sdk.accessToken = token.AccessToken
 
 	status, err := sdk.GetStatus()
 	if err != nil {
 		return nil, err
 	}
 	sdk.APIVersion = status.ApiVersion
-	sdk.ServerVersion = status.ProjectVersion
+	sdk.serverVersion = status.ProjectVersion
 
 	apps, err := sdk.GetApplications(map[string]string{"name": sdk.Username})
 	if err != nil {
@@ -57,10 +57,10 @@ func New(conf *Config) (*SDK, error) {
 	} else if len(apps) != 1 {
 		return nil, errors.New("not exactly 1 result from app lookup")
 	}
-	sdk.ApplicationID = apps[0].ID
+	sdk.applicationID = apps[0].ID
 
 	if conf.CallbackURL != nil {
-		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
+		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.applicationID))})
 		if err != nil {
 			return nil, err
 		}
@@ -69,10 +69,10 @@ func New(conf *Config) (*SDK, error) {
 				return nil, err
 			}
 		}
-		if _, err := sdk.NewCallback(*conf.CallbackURL, sdk.ApplicationID, *conf.CallbackSecret); err != nil {
+		if _, err := sdk.NewCallback(*conf.CallbackURL, sdk.applicationID, *conf.CallbackSecret); err != nil {
 			return nil, err
 		}
-		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
+		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.applicationID))})
 		if err != nil {
 			return nil, err
 		}
@@ -83,9 +83,9 @@ func New(conf *Config) (*SDK, error) {
 	if err != nil {
 		return nil, err
 	}
-	sdk.CommunityUserID = communityUsers[0].ID
+	sdk.communityUserID = communityUsers[0].ID
 	for _, alias := range communityUsers[0].Aliases {
-		if alias.Confirmed && alias.ApplicationID == sdk.ApplicationID {
+		if alias.Confirmed && alias.ApplicationID == sdk.applicationID {
 			sdk.CommunityUsername = &alias.Username
 		}
 	}
@@ -93,10 +93,10 @@ func New(conf *Config) (*SDK, error) {
 	return &sdk, err
 }
 
-func (sdk *SDK) Shutdown() error {
-	for _, callback := range sdk.Callbacks {
-		if *callback.ApplicationID == sdk.ApplicationID {
-			if success, err := sdk.DeleteCallback(callback.ID); err != nil || !success {
+func (s *sdk) Shutdown() error {
+	for _, callback := range s.Callbacks {
+		if *callback.ApplicationID == s.applicationID {
+			if success, err := s.DeleteCallback(callback.ID); err != nil || !success {
 				return err
 			}
 		}

@@ -10,8 +10,8 @@ import (
 	"net/url"
 )
 
-func get(endpoint string, filter map[string]string, sdk *SDK, retry bool) (int, []byte, error) {
-	uri := sdk.BaseUrl + endpoint
+func get(endpoint string, filter map[string]string, s *sdk, retry bool) (int, []byte, error) {
+	uri := s.BaseUrl + endpoint
 	query := url.Values(map[string][]string{})
 	if filter != nil {
 		for k, v := range filter {
@@ -26,7 +26,7 @@ func get(endpoint string, filter map[string]string, sdk *SDK, retry bool) (int, 
 	if err != nil {
 		return 0, nil, err
 	}
-	request.Header.Set("Authorization", "Bearer "+sdk.AccessToken)
+	request.Header.Set("Authorization", "Bearer "+s.accessToken)
 
 	client := http.Client{}
 	response, err := client.Do(request)
@@ -50,12 +50,12 @@ func get(endpoint string, filter map[string]string, sdk *SDK, retry bool) (int, 
 
 	if response.StatusCode == 401 && retry {
 		log.Println("Invalid login token, trying to refresh...")
-		token, err := GetLoginToken(sdk.Username, sdk.Password, sdk.BaseUrl)
+		token, err := GetLoginToken(s.Username, s.password, s.BaseUrl)
 		if err != nil {
 			return 401, nil, err
 		}
-		sdk.AccessToken = token.AccessToken
-		return get(endpoint, filter, sdk, false)
+		s.accessToken = token.AccessToken
+		return get(endpoint, filter, s, false)
 	}
 
 	if response.StatusCode >= 400 {
@@ -70,18 +70,18 @@ func get(endpoint string, filter map[string]string, sdk *SDK, retry bool) (int, 
 	return response.StatusCode, body, err
 }
 
-func Get(endpoint string, filter map[string]string, sdk *SDK) (int, []byte, error) {
+func Get(endpoint string, filter map[string]string, sdk *sdk) (int, []byte, error) {
 	return get(endpoint, filter, sdk, true)
 }
 
-func requestPayload(endpoint string, content []byte, sdk *SDK, retry bool, method string) (int, []byte, error) {
+func requestPayload(endpoint string, content []byte, sdk *sdk, retry bool, method string) (int, []byte, error) {
 	uri := sdk.BaseUrl + endpoint
 
 	request, err := http.NewRequest(method, uri, bytes.NewBuffer(content))
 	if err != nil {
 		return 0, []byte{}, err
 	}
-	request.Header.Set("Authorization", "Bearer "+sdk.AccessToken)
+	request.Header.Set("Authorization", "Bearer "+sdk.accessToken)
 	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	client := http.Client{}
@@ -106,11 +106,11 @@ func requestPayload(endpoint string, content []byte, sdk *SDK, retry bool, metho
 
 	if response.StatusCode == 401 && retry {
 		log.Println("Invalid login token, trying to refresh...")
-		token, err := GetLoginToken(sdk.Username, sdk.Password, sdk.BaseUrl)
+		token, err := GetLoginToken(sdk.Username, sdk.password, sdk.BaseUrl)
 		if err != nil {
 			return 401, []byte{}, err
 		}
-		sdk.AccessToken = token.AccessToken
+		sdk.accessToken = token.AccessToken
 		return requestPayload(endpoint, content, sdk, false, method)
 	}
 
@@ -126,10 +126,10 @@ func requestPayload(endpoint string, content []byte, sdk *SDK, retry bool, metho
 	return response.StatusCode, body, err
 }
 
-func Post(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
+func Post(endpoint string, content []byte, sdk *sdk) (int, []byte, error) {
 	return requestPayload(endpoint, content, sdk, true, "POST")
 }
 
-func Delete(endpoint string, content []byte, sdk *SDK) (int, []byte, error) {
+func Delete(endpoint string, content []byte, sdk *sdk) (int, []byte, error) {
 	return requestPayload(endpoint, content, sdk, true, "DELETE")
 }
