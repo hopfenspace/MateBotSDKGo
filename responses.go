@@ -45,38 +45,38 @@ type Settings struct {
 }
 
 type Application struct {
-	Id      uint   `json:"id"`
+	ID      uint   `json:"id"`
 	Name    string `json:"name"`
 	Created uint   `json:"created"`
 }
 
 type Callback struct {
-	Id            uint    `json:"id"`
+	ID            uint    `json:"id"`
 	Url           string  `json:"url"`
-	ApplicationId *uint   `json:"application_id"`
+	ApplicationID *uint   `json:"application_id"`
 	SharedSecret  *string `json:"shared_secret"`
 }
 
 type Alias struct {
-	Id            uint   `json:"id"`
-	UserId        uint   `json:"user_id"`
-	ApplicationId uint   `json:"application_id"`
+	ID            uint   `json:"id"`
+	UserID        uint   `json:"user_id"`
+	ApplicationID uint   `json:"application_id"`
 	Username      string `json:"username"`
 	Confirmed     bool   `json:"confirmed"`
 }
 
 type AliasDeletion struct {
-	UserId  uint    `json:"user_id"`
+	UserID  uint    `json:"user_id"`
 	Aliases []Alias `json:"aliases"`
 }
 
 type User struct {
-	Id         uint    `json:"id"`
+	ID         uint    `json:"id"`
 	Balance    int     `json:"balance"`
 	Permission bool    `json:"permission"`
 	Active     bool    `json:"active"`
 	External   bool    `json:"external"`
-	VoucherId  *uint   `json:"voucher_id"`
+	VoucherID  *uint   `json:"voucher_id"`
 	Aliases    []Alias `json:"aliases"`
 	Created    uint    `json:"created"`
 	Modified   uint    `json:"modified"`
@@ -97,7 +97,7 @@ func (u *User) Privilege() PrivilegeLevel {
 		return Disabled
 	}
 	if u.External {
-		if u.VoucherId == nil {
+		if u.VoucherID == nil {
 			return External
 		} else {
 			return Vouched
@@ -111,12 +111,12 @@ func (u *User) Privilege() PrivilegeLevel {
 }
 
 type Transaction struct {
-	Id                 uint    `json:"id"`
+	ID                 uint    `json:"id"`
 	Sender             User    `json:"sender"`
 	Receiver           User    `json:"receiver"`
 	Amount             uint    `json:"amount"`
 	Reason             *string `json:"reason"`
-	MultiTransactionId *uint   `json:"multi_transaction_id"`
+	MultiTransactionID *uint   `json:"multi_transaction_id"`
 	Timestamp          uint    `json:"timestamp"`
 }
 
@@ -127,7 +127,7 @@ type VoucherUpdate struct {
 }
 
 type MultiTransaction struct {
-	Id           uint          `json:"id"`
+	ID           uint          `json:"id"`
 	BaseAmount   uint          `json:"base_amount"`
 	TotalAmount  uint          `json:"total_amount"`
 	Transactions []Transaction `json:"transactions"`
@@ -141,15 +141,15 @@ type Consumable struct {
 }
 
 type CommunismParticipant struct {
-	UserId   uint `json:"user_id"`
+	UserID   uint `json:"user_id"`
 	Quantity uint `json:"quantity"`
 }
 
 type Communism struct {
-	Id               uint                   `json:"id"`
+	ID               uint                   `json:"id"`
 	Amount           uint                   `json:"amount"`
 	Description      string                 `json:"description"`
-	CreatorId        uint                   `json:"creator_id"`
+	CreatorID        uint                   `json:"creator_id"`
 	Active           bool                   `json:"active"`
 	Created          uint                   `json:"created"`
 	Modified         uint                   `json:"modified"`
@@ -158,9 +158,9 @@ type Communism struct {
 }
 
 type Vote struct {
-	Id       uint `json:"id"`
-	UserId   uint `json:"user_id"`
-	BallotId uint `json:"ballot_id"`
+	ID       uint `json:"id"`
+	UserID   uint `json:"user_id"`
+	BallotID uint `json:"ballot_id"`
 	Vote     bool `json:"vote"`
 	Modified uint `json:"modified"`
 }
@@ -175,13 +175,13 @@ const (
 )
 
 type Poll struct {
-	Id        uint        `json:"id"`
+	ID        uint        `json:"id"`
 	Active    bool        `json:"active"`
 	Accepted  *bool       `json:"accepted"`
 	Variant   PollVariant `json:"variant"`
 	User      User        `json:"user"`
-	CreatorId uint        `json:"creator_id"`
-	BallotId  uint        `json:"ballot_id"`
+	CreatorID uint        `json:"creator_id"`
+	BallotID  uint        `json:"ballot_id"`
 	Votes     []Vote      `json:"votes"`
 	Created   uint        `json:"created"`
 	Modified  uint        `json:"modified"`
@@ -193,13 +193,13 @@ type PollVote struct {
 }
 
 type Refund struct {
-	Id          uint         `json:"id"`
+	ID          uint         `json:"id"`
 	Amount      uint         `json:"amount"`
 	Description string       `json:"description"`
 	Creator     User         `json:"creator"`
 	Active      bool         `json:"active"`
 	Allowed     *bool        `json:"allowed"`
-	BallotId    uint         `json:"ballot_id"`
+	BallotID    uint         `json:"ballot_id"`
 	Votes       []Vote       `json:"votes"`
 	Transaction *Transaction `json:"transaction"`
 	Created     *uint        `json:"created"`
@@ -234,7 +234,7 @@ const (
 
 // The EventData struct may contain any of the available fields, depending on the event type
 type EventData struct {
-	Id                  *uint        `json:"id"`
+	ID                  *uint        `json:"id"`
 	App                 *string      `json:"app"`
 	ServerBaseUrl       *string      `json:"base_url"`
 	TransactionSender   *uint        `json:"sender"`

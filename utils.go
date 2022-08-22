@@ -11,7 +11,7 @@ type Config struct {
 	BaseUrl        string
 	Username       string
 	Password       string
-	CallbackUrl    *string
+	CallbackURL    *string
 	CallbackSecret *string
 	Currency       Currency
 }
@@ -23,8 +23,8 @@ type Currency struct {
 }
 
 func New(conf *Config) (*SDK, error) {
-	if (conf.CallbackUrl != nil && conf.CallbackSecret == nil) || (conf.CallbackUrl == nil && conf.CallbackSecret != nil) {
-		return nil, errors.New("options 'CallbackUrl' and 'CallbackSecret' must both be set or omitted")
+	if (conf.CallbackURL != nil && conf.CallbackSecret == nil) || (conf.CallbackURL == nil && conf.CallbackSecret != nil) {
+		return nil, errors.New("options 'CallbackURL' and 'CallbackSecret' must both be set or omitted")
 	}
 
 	baseUrl := conf.BaseUrl
@@ -57,19 +57,19 @@ func New(conf *Config) (*SDK, error) {
 	} else if len(apps) != 1 {
 		return nil, errors.New("not exactly 1 result from app lookup")
 	}
-	sdk.ApplicationID = apps[0].Id
+	sdk.ApplicationID = apps[0].ID
 
-	if conf.CallbackUrl != nil {
+	if conf.CallbackURL != nil {
 		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
 		if err != nil {
 			return nil, err
 		}
 		for _, callback := range callbacks {
-			if success, err := sdk.DeleteCallback(callback.Id); err != nil || !success {
+			if success, err := sdk.DeleteCallback(callback.ID); err != nil || !success {
 				return nil, err
 			}
 		}
-		if _, err := sdk.NewCallback(*conf.CallbackUrl, sdk.ApplicationID, *conf.CallbackSecret); err != nil {
+		if _, err := sdk.NewCallback(*conf.CallbackURL, sdk.ApplicationID, *conf.CallbackSecret); err != nil {
 			return nil, err
 		}
 		callbacks, err = sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.ApplicationID))})
@@ -83,9 +83,9 @@ func New(conf *Config) (*SDK, error) {
 	if err != nil {
 		return nil, err
 	}
-	sdk.CommunityUserID = communityUsers[0].Id
+	sdk.CommunityUserID = communityUsers[0].ID
 	for _, alias := range communityUsers[0].Aliases {
-		if alias.Confirmed && alias.ApplicationId == sdk.ApplicationID {
+		if alias.Confirmed && alias.ApplicationID == sdk.ApplicationID {
 			sdk.CommunityUsername = &alias.Username
 		}
 	}

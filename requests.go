@@ -1,18 +1,18 @@
 package MateBotSDKGo
 
-type IdBody struct {
-	Id uint `json:"id"`
+type IDBody struct {
+	ID uint `json:"id"`
 }
 
 type NewCallback struct {
 	Url           string `json:"url"`
-	ApplicationId uint   `json:"application_id"`
+	ApplicationID uint   `json:"application_id"`
 	SharedSecret  string `json:"shared_secret"`
 }
 
 type NewAlias struct {
-	UserId        uint   `json:"user_id"`
-	ApplicationId uint   `json:"application_id"`
+	UserID        uint   `json:"user_id"`
+	ApplicationID uint   `json:"application_id"`
 	Username      string `json:"username"`
 	Confirmed     bool   `json:"confirmed"`
 }
@@ -50,12 +50,12 @@ type NewRefund struct {
 
 type NewVote struct {
 	User     any  `json:"user"`
-	BallotId uint `json:"ballot_id"`
+	BallotID uint `json:"ballot_id"`
 	Vote     bool `json:"vote"`
 }
 
-type IssuerIdBody struct {
-	Id     uint `json:"id"`
+type IssuerIDBody struct {
+	ID     uint `json:"id"`
 	Issuer any  `json:"issuer"`
 }
 
@@ -71,6 +71,6 @@ type VoucherUpdateRequest struct {
 }
 
 type CommunismParticipationUpdate struct {
-	Id   uint `json:"id"`
+	ID   uint `json:"id"`
 	User any  `json:"user"`
 }

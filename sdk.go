@@ -28,20 +28,20 @@ func (sdk *SDK) FormatUsername(user *User, findUsername *func(uint) (string, err
 		return "Unknown user", errors.New("invalid user")
 	}
 	if findUsername != nil {
-		username, err := (*findUsername)(user.Id)
+		username, err := (*findUsername)(user.ID)
 		if err == nil {
 			return username, nil
 		}
 	}
 	for _, alias := range user.Aliases {
-		if alias.ApplicationId == sdk.ApplicationID && alias.Confirmed {
+		if alias.ApplicationID == sdk.ApplicationID && alias.Confirmed {
 			return alias.Username, nil
 		}
 	}
-	if user.Id == sdk.CommunityUserID {
+	if user.ID == sdk.CommunityUserID {
 		return "Community", nil
 	}
-	return fmt.Sprintf("User %d", user.Id), errors.New("no results")
+	return fmt.Sprintf("User %d", user.ID), errors.New("no results")
 }
 
 func (sdk *SDK) FormatBalance(balance int) string {
@@ -223,12 +223,12 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 		return nil, err
 	}
 
-	var userId int
+	var userID int
 	switch userIdOrUsername.(type) {
 	case uint, uint16, uint32, uint64:
-		userId = int(userIdOrUsername.(uint))
+		userID = int(userIdOrUsername.(uint))
 	case int, int16, int32, int64:
-		userId = userIdOrUsername.(int)
+		userID = userIdOrUsername.(int)
 	case string:
 		filter := map[string]string{
 			"active":               "true",
@@ -254,7 +254,7 @@ func (sdk *SDK) GetUser(userIdOrUsername any, extendedFilter *map[string]string)
 		return nil, errors.New("invalid")
 	}
 
-	filter := map[string]string{"active": "true", "id": strconv.Itoa(userId)}
+	filter := map[string]string{"active": "true", "id": strconv.Itoa(userID)}
 	if extendedFilter != nil {
 		for k, v := range *extendedFilter {
 			filter[k] = v
@@ -312,8 +312,8 @@ func (sdk *SDK) abortSomething(obj uint, issuer any, endpoint string) ([]byte, e
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIdBody{
-		Id:     obj,
+	content, err := json.Marshal(IssuerIDBody{
+		ID:     obj,
 		Issuer: issuer,
 	})
 	if err != nil {
@@ -416,8 +416,8 @@ func (sdk *SDK) DeleteUser(userID uint, issuer any) (*User, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIdBody{
-		Id:     userID,
+	content, err := json.Marshal(IssuerIDBody{
+		ID:     userID,
 		Issuer: issuer,
 	})
 	if err != nil {
@@ -441,8 +441,8 @@ func (sdk *SDK) newAlias(userID uint, username string, confirmed *bool) (*Alias,
 	var content []byte
 	if confirmed == nil {
 		if c, err := json.Marshal(NewAlias{
-			UserId:        userID,
-			ApplicationId: sdk.ApplicationID,
+			UserID:        userID,
+			ApplicationID: sdk.ApplicationID,
 			Username:      username,
 			Confirmed:     false,
 		}); err != nil {
@@ -452,8 +452,8 @@ func (sdk *SDK) newAlias(userID uint, username string, confirmed *bool) (*Alias,
 		}
 	} else {
 		if c, err := json.Marshal(NewAlias{
-			UserId:        userID,
-			ApplicationId: sdk.ApplicationID,
+			UserID:        userID,
+			ApplicationID: sdk.ApplicationID,
 			Username:      username,
 			Confirmed:     *confirmed,
 		}); err != nil {
@@ -488,15 +488,15 @@ func (sdk *SDK) NewUserWithAlias(username string) (*User, error) {
 	}
 
 	c := true
-	alias, err := sdk.newAlias(user.Id, username, &c)
+	alias, err := sdk.newAlias(user.ID, username, &c)
 	if err != nil {
 		return user, err
 	}
-	if _, err := sdk.ConfirmAlias(alias.Id, user.Id); err != nil {
+	if _, err := sdk.ConfirmAlias(alias.ID, user.ID); err != nil {
 		return user, err
 	}
 
-	users, err := sdk.GetUsers(map[string]string{"id": strconv.Itoa(int(user.Id))})
+	users, err := sdk.GetUsers(map[string]string{"id": strconv.Itoa(int(user.ID))})
 	if err != nil {
 		return user, err
 	}
@@ -508,8 +508,8 @@ func (sdk *SDK) ConfirmAlias(aliasID uint, issuer any) (*Alias, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIdBody{
-		Id:     aliasID,
+	content, err := json.Marshal(IssuerIDBody{
+		ID:     aliasID,
 		Issuer: issuer,
 	})
 	if err != nil {
@@ -534,8 +534,8 @@ func (sdk *SDK) DeleteAlias(aliasID uint, issuer any) (*AliasDeletion, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIdBody{
-		Id:     aliasID,
+	content, err := json.Marshal(IssuerIDBody{
+		ID:     aliasID,
 		Issuer: issuer,
 	})
 	if err != nil {
@@ -668,7 +668,7 @@ func (sdk *SDK) changeCommunismParticipation(communismID uint, user any, endpoin
 	}
 
 	content, err := json.Marshal(CommunismParticipationUpdate{
-		Id:   communismID,
+		ID:   communismID,
 		User: user,
 	})
 	if err != nil {
@@ -788,7 +788,7 @@ func (sdk *SDK) vote(ballotID uint, user any, vote bool, endpoint string) ([]byt
 
 	content, err := json.Marshal(NewVote{
 		User:     user,
-		BallotId: ballotID,
+		BallotID: ballotID,
 		Vote:     vote,
 	})
 	if err != nil {
@@ -833,7 +833,7 @@ func (sdk *SDK) VoteOnRefundBallot(ballotID uint, user any, vote bool) (*RefundV
 func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string) (*Callback, error) {
 	content, err := json.Marshal(NewCallback{
 		Url:           url,
-		ApplicationId: applicationID,
+		ApplicationID: applicationID,
 		SharedSecret:  sharedSecret,
 	})
 	if err != nil {
@@ -854,7 +854,7 @@ func (sdk *SDK) NewCallback(url string, applicationID uint, sharedSecret string)
 }
 
 func (sdk *SDK) DeleteCallback(id uint) (bool, error) {
-	content, err := json.Marshal(IdBody{Id: id})
+	content, err := json.Marshal(IDBody{ID: id})
 	if err != nil {
 		return false, err
 	}
