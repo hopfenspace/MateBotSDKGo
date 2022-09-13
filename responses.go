@@ -142,8 +142,9 @@ type Consumable struct {
 }
 
 type CommunismParticipant struct {
-	UserID   uint `json:"user_id"`
-	Quantity uint `json:"quantity"`
+	UserID   uint   `json:"user_id"`
+	Username string `json:"user_name"`
+	Quantity uint   `json:"quantity"`
 }
 
 type Communism struct {
@@ -159,11 +160,12 @@ type Communism struct {
 }
 
 type Vote struct {
-	ID       uint `json:"id"`
-	UserID   uint `json:"user_id"`
-	BallotID uint `json:"ballot_id"`
-	Vote     bool `json:"vote"`
-	Modified uint `json:"modified"`
+	ID       uint   `json:"id"`
+	UserID   uint   `json:"user_id"`
+	Username string `json:"user_name"`
+	BallotID uint   `json:"ballot_id"`
+	Vote     bool   `json:"vote"`
+	Modified uint   `json:"modified"`
 }
 
 type PollVariant string
