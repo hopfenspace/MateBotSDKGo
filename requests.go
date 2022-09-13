@@ -10,6 +10,10 @@ type NewCallback struct {
 	SharedSecret  string `json:"shared_secret"`
 }
 
+type NewUser struct {
+	Name string `json:"name"`
+}
+
 type NewAlias struct {
 	UserID        uint   `json:"user_id"`
 	ApplicationID uint   `json:"application_id"`
@@ -62,6 +66,11 @@ type IssuerIDBody struct {
 type UserPrivilegeDrop struct {
 	User   any `json:"user"`
 	Issuer any `json:"issuer"`
+}
+
+type UsernameUpdateRequest struct {
+	Name   string `json:"name"`
+	Issuer any    `json:"issuer"`
 }
 
 type VoucherUpdateRequest struct {

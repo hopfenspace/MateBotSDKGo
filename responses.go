@@ -73,6 +73,7 @@ type AliasDeletion struct {
 type User struct {
 	ID         uint    `json:"id"`
 	Balance    int     `json:"balance"`
+	Name       string  `json:"name"`
 	Permission bool    `json:"permission"`
 	Active     bool    `json:"active"`
 	External   bool    `json:"external"`

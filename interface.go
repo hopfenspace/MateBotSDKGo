@@ -1,7 +1,6 @@
 package MateBotSDKGo
 
 type SDK interface {
-	FormatUsername(user *User, findUsername *func(uint) (string, error)) (string, error)
 	FormatBalance(balance int) string
 
 	GetStatus() (*Status, error)
@@ -21,9 +20,10 @@ type SDK interface {
 	FindSponsoringUser(issuer *User) (*User, error)
 	GetCommunityBalance(issuer *User) (int, error)
 
-	NewUser() (*User, error)
+	NewUser(username string) (*User, error)
 	DropInternalPrivilege(user any, issuer any) (*User, error)
 	DropPermissionPrivilege(user any, issuer any) (*User, error)
+	SetUsername(issuer any, newName string) (*User, error)
 	SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, error)
 	DeleteUser(userID uint, issuer any) (*User, error)
 

@@ -23,27 +23,6 @@ type sdk struct {
 	CommunityUsername *string
 }
 
-func (s *sdk) FormatUsername(user *User, findUsername *func(uint) (string, error)) (string, error) {
-	if user == nil {
-		return "Unknown user", errors.New("invalid user")
-	}
-	if findUsername != nil {
-		username, err := (*findUsername)(user.ID)
-		if err == nil {
-			return username, nil
-		}
-	}
-	for _, alias := range user.Aliases {
-		if alias.ApplicationID == s.applicationID && alias.Confirmed {
-			return alias.Username, nil
-		}
-	}
-	if user.ID == s.communityUserID {
-		return "Community", nil
-	}
-	return fmt.Sprintf("User %d", user.ID), errors.New("no results")
-}
-
 func (s *sdk) FormatBalance(balance int) string {
 	v := float64(balance) / float64(s.Currency.Factor)
 	return fmt.Sprintf("%."+strconv.Itoa(int(s.Currency.Digits))+"f%s", v, s.Currency.Symbol)
@@ -217,6 +196,23 @@ func (s *sdk) GetVotes(filter map[string]string) ([]*Vote, error) {
 	return votes, err
 }
 
+func (s *sdk) lookupUsers(name string, extendedFilter *map[string]string, isAlias bool) ([]*User, error) {
+	filter := map[string]string{"active": "true"}
+	if isAlias {
+		filter["alias_confirmed"] = "true"
+		filter["alias_username"] = name
+		filter["alias_application_id"] = strconv.Itoa(int(s.applicationID))
+	} else {
+		filter["name"] = name
+	}
+	if extendedFilter != nil {
+		for k, v := range *extendedFilter {
+			filter[k] = v
+		}
+	}
+	return s.GetUsers(filter)
+}
+
 func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (*User, error) {
 	err := checkStrOrPosInt(userIdOrUsername, false)
 	if err != nil {
@@ -230,26 +226,22 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 	case int, int16, int32, int64:
 		userID = userIdOrUsername.(int)
 	case string:
-		filter := map[string]string{
-			"active":               "true",
-			"alias_confirmed":      "true",
-			"alias_username":       userIdOrUsername.(string),
-			"alias_application_id": strconv.Itoa(int(s.applicationID)),
-		}
-		if extendedFilter != nil {
-			for k, v := range *extendedFilter {
-				filter[k] = v
-			}
-		}
-		users, err := s.GetUsers(filter)
+		users, err := s.lookupUsers(userIdOrUsername.(string), extendedFilter, false)
 		if err != nil {
 			return nil, err
-		} else if len(users) < 1 {
-			return nil, errors.New("no user found")
-		} else if len(users) > 1 {
-			return nil, errors.New("ambiguous username")
+		} else if len(users) == 1 {
+			return users[0], nil
+		} else {
+			users, err = s.lookupUsers(userIdOrUsername.(string), extendedFilter, true)
+			if err != nil {
+				return nil, err
+			} else if len(users) < 1 {
+				return nil, errors.New("no user found")
+			} else if len(users) > 1 {
+				return nil, errors.New("ambiguous username")
+			}
+			return users[0], nil
 		}
-		return users[0], nil
 	default:
 		return nil, errors.New("invalid")
 	}
@@ -327,8 +319,15 @@ func (s *sdk) abortSomething(obj uint, issuer any, endpoint string) ([]byte, err
 	return body, err
 }
 
-func (s *sdk) NewUser() (*User, error) {
-	_, body, err := Post("/v1/users", nil, s)
+func (s *sdk) NewUser(username string) (*User, error) {
+	content, err := json.Marshal(NewUser{
+		Name: username,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, body, err := Post("/v1/users", content, s)
 	if err != nil {
 		return nil, err
 	}
@@ -376,6 +375,32 @@ func (s *sdk) DropInternalPrivilege(user any, issuer any) (*User, error) {
 
 func (s *sdk) DropPermissionPrivilege(user any, issuer any) (*User, error) {
 	return s.dropPrivilege(user, issuer, "/v1/users/dropPermission")
+}
+
+func (s *sdk) SetUsername(issuer any, newName string) (*User, error) {
+	if err := checkStrOrPosInt(issuer, true); err != nil {
+		return nil, err
+	}
+
+	content, err := json.Marshal(UsernameUpdateRequest{
+		Name:   newName,
+		Issuer: issuer,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, body, err := Post("/v1/users/setName", content, s)
+	if err != nil {
+		return nil, err
+	}
+
+	var user *User
+	if err = json.Unmarshal(body, &user); err != nil {
+		log.Println("No valid JSON body:", err)
+		return nil, err
+	}
+	return user, err
 }
 
 func (s *sdk) SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, error) {
@@ -482,7 +507,7 @@ func (s *sdk) NewAlias(userID uint, username string) (*Alias, error) {
 }
 
 func (s *sdk) NewUserWithAlias(username string) (*User, error) {
-	user, err := s.NewUser()
+	user, err := s.NewUser(username)
 	if err != nil {
 		return nil, err
 	}
