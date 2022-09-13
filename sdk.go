@@ -304,7 +304,7 @@ func (s *sdk) abortSomething(obj uint, issuer any, endpoint string) ([]byte, err
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIDBody{
+	content, err := json.Marshal(issuerID{
 		ID:     obj,
 		Issuer: issuer,
 	})
@@ -320,7 +320,7 @@ func (s *sdk) abortSomething(obj uint, issuer any, endpoint string) ([]byte, err
 }
 
 func (s *sdk) NewUser(username string) (*User, error) {
-	content, err := json.Marshal(NewUser{
+	content, err := json.Marshal(newUser{
 		Name: username,
 	})
 	if err != nil {
@@ -348,7 +348,7 @@ func (s *sdk) dropPrivilege(user any, issuer any, endpoint string) (*User, error
 		return nil, err
 	}
 
-	content, err := json.Marshal(UserPrivilegeDrop{
+	content, err := json.Marshal(userPrivilegeDrop{
 		User:   user,
 		Issuer: issuer,
 	})
@@ -382,7 +382,7 @@ func (s *sdk) SetUsername(issuer any, newName string) (*User, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(UsernameUpdateRequest{
+	content, err := json.Marshal(usernameUpdate{
 		Name:   newName,
 		Issuer: issuer,
 	})
@@ -414,7 +414,7 @@ func (s *sdk) SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, e
 		return nil, err
 	}
 
-	content, err := json.Marshal(VoucherUpdateRequest{
+	content, err := json.Marshal(voucherUpdate{
 		Debtor:  debtor,
 		Voucher: voucher,
 		Issuer:  issuer,
@@ -441,7 +441,7 @@ func (s *sdk) DeleteUser(userID uint, issuer any) (*User, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIDBody{
+	content, err := json.Marshal(issuerID{
 		ID:     userID,
 		Issuer: issuer,
 	})
@@ -465,7 +465,7 @@ func (s *sdk) DeleteUser(userID uint, issuer any) (*User, error) {
 func (s *sdk) newAlias(userID uint, username string, confirmed *bool) (*Alias, error) {
 	var content []byte
 	if confirmed == nil {
-		if c, err := json.Marshal(NewAlias{
+		if c, err := json.Marshal(newAlias{
 			UserID:        userID,
 			ApplicationID: s.applicationID,
 			Username:      username,
@@ -476,7 +476,7 @@ func (s *sdk) newAlias(userID uint, username string, confirmed *bool) (*Alias, e
 			content = c
 		}
 	} else {
-		if c, err := json.Marshal(NewAlias{
+		if c, err := json.Marshal(newAlias{
 			UserID:        userID,
 			ApplicationID: s.applicationID,
 			Username:      username,
@@ -530,7 +530,7 @@ func (s *sdk) ConfirmAlias(aliasID uint, issuer any) (*Alias, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIDBody{
+	content, err := json.Marshal(issuerID{
 		ID:     aliasID,
 		Issuer: issuer,
 	})
@@ -556,7 +556,7 @@ func (s *sdk) DeleteAlias(aliasID uint, issuer any) (*AliasDeletion, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(IssuerIDBody{
+	content, err := json.Marshal(issuerID{
 		ID:     aliasID,
 		Issuer: issuer,
 	})
@@ -585,7 +585,7 @@ func (s *sdk) SendTransaction(sender any, receiver any, amount uint, reason stri
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewTransaction{
+	content, err := json.Marshal(newTransaction{
 		Sender:   sender,
 		Receiver: receiver,
 		Amount:   amount,
@@ -613,7 +613,7 @@ func (s *sdk) ConsumeTransaction(consumer any, amount uint, consumable string) (
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewConsumption{
+	content, err := json.Marshal(newConsumption{
 		User:       consumer,
 		Amount:     amount,
 		Consumable: consumable,
@@ -640,7 +640,7 @@ func (s *sdk) NewCommunism(creator any, amount uint, description string) (*Commu
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewCommunism{
+	content, err := json.Marshal(newCommunism{
 		Creator:     creator,
 		Amount:      amount,
 		Description: description,
@@ -689,7 +689,7 @@ func (s *sdk) changeCommunismParticipation(communismID uint, user any, endpoint 
 		return nil, err
 	}
 
-	content, err := json.Marshal(CommunismParticipationUpdate{
+	content, err := json.Marshal(communismParticipationUpdate{
 		ID:   communismID,
 		User: user,
 	})
@@ -726,7 +726,7 @@ func (s *sdk) NewPoll(user any, issuer any, variant string) (*Poll, error) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewPoll{
+	content, err := json.Marshal(newPoll{
 		User:    user,
 		Issuer:  issuer,
 		Variant: variant,
@@ -753,7 +753,7 @@ func (s *sdk) NewRefund(creator any, amount uint, description string) (*Refund, 
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewRefund{
+	content, err := json.Marshal(newRefund{
 		Creator:     creator,
 		Amount:      amount,
 		Description: description,
@@ -808,7 +808,7 @@ func (s *sdk) vote(ballotID uint, user any, vote bool, endpoint string) ([]byte,
 		return nil, err
 	}
 
-	content, err := json.Marshal(NewVote{
+	content, err := json.Marshal(newVote{
 		User:     user,
 		BallotID: ballotID,
 		Vote:     vote,
@@ -853,7 +853,7 @@ func (s *sdk) VoteOnRefundBallot(ballotID uint, user any, vote bool) (*RefundVot
 }
 
 func (s *sdk) NewCallback(url string, applicationID uint, sharedSecret string) (*Callback, error) {
-	content, err := json.Marshal(NewCallback{
+	content, err := json.Marshal(newCallback{
 		Url:           url,
 		ApplicationID: applicationID,
 		SharedSecret:  sharedSecret,
@@ -876,7 +876,7 @@ func (s *sdk) NewCallback(url string, applicationID uint, sharedSecret string) (
 }
 
 func (s *sdk) DeleteCallback(id uint) (bool, error) {
-	content, err := json.Marshal(IDBody{ID: id})
+	content, err := json.Marshal(simpleID{ID: id})
 	if err != nil {
 		return false, err
 	}
