@@ -23,6 +23,26 @@ type sdk struct {
 	CommunityUsername *string
 }
 
+func (s *sdk) GetThisApplicationID() uint {
+	return s.applicationID
+}
+
+func (s *sdk) GetThisApplicationName() string {
+	return s.Username
+}
+
+func (s *sdk) GetCommunityID() uint {
+	return s.communityUserID
+}
+
+func (s *sdk) GetCommunityUsername() *string {
+	return s.CommunityUsername
+}
+
+func (s *sdk) GetCurrency() Currency {
+	return s.Currency
+}
+
 func (s *sdk) FormatBalance(balance int) string {
 	v := float64(balance) / float64(s.Currency.Factor)
 	return fmt.Sprintf("%."+strconv.Itoa(int(s.Currency.Digits))+"f%s", v, s.Currency.Symbol)

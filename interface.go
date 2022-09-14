@@ -1,6 +1,10 @@
 package MateBotSDKGo
 
 type SDK interface {
+	GetThisApplicationID() uint
+	GetThisApplicationName() string
+	GetCommunityUsername() *string
+	GetCurrency() Currency
 	FormatBalance(balance int) string
 
 	GetStatus() (*Status, error)
