@@ -268,7 +268,7 @@ func (s *sdk) FindSponsoringUser(issuer *User) (*User, error) {
 		return nil, errors.New("invalid user account")
 	} else if !issuer.Active {
 		return nil, errors.New("this user account has been disabled")
-	} else if issuer.External {
+	} else if issuer.Privilege() < Internal {
 		return nil, errors.New("you don't have the permission to request this information")
 	}
 
@@ -288,7 +288,7 @@ func (s *sdk) GetCommunityBalance(issuer *User) (int, error) {
 		return 0, errors.New("invalid user account")
 	} else if !issuer.Active {
 		return 0, errors.New("this user account has been disabled")
-	} else if issuer.External {
+	} else if issuer.Privilege() < Internal {
 		return 0, errors.New("you don't have the permission to request this information")
 	}
 	community, err := s.GetUser(s.communityUserID, &map[string]string{"community": "true"})
