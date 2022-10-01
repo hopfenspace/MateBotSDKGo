@@ -54,7 +54,6 @@ type Callback struct {
 	ID            uint    `json:"id"`
 	Url           string  `json:"url"`
 	ApplicationID *uint   `json:"application_id"`
-	SharedSecret  *string `json:"shared_secret"`
 }
 
 type Alias struct {
