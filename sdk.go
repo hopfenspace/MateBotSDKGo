@@ -1,10 +1,13 @@
 package MateBotSDKGo
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"sort"
 	"strconv"
 )
@@ -16,8 +19,6 @@ type sdk struct {
 	applicationID     uint
 	accessToken       string
 	Callbacks         []*Callback
-	APIVersion        uint
-	serverVersion     VersionInfo
 	Currency          Currency
 	communityUserID   uint
 	CommunityUsername *string
@@ -48,18 +49,28 @@ func (s *sdk) FormatBalance(balance int) string {
 	return fmt.Sprintf("%."+strconv.Itoa(int(s.Currency.Digits))+"f%s", v, s.Currency.Symbol)
 }
 
-func (s *sdk) GetStatus() (*Status, error) {
-	_, body, err := Get("/v1/status", nil, s)
+func (s *sdk) GetHealth() (bool, error) {
+	uri := s.BaseUrl + "/v1/health"
+	request, err := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	var status *Status
-	if err = json.Unmarshal(body, &status); err != nil {
-		log.Println("No valid JSON body:", err)
-		return nil, err
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		log.Println(fmt.Sprintf("Error performing 'GET %s' request:", uri), err)
+		return false, err
 	}
-	return status, err
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Println("Unexpected error while closing response buffer:", err)
+		}
+	}(response.Body)
+
+	return response.StatusCode == 200, err
 }
 
 func (s *sdk) GetSettings() (*Settings, error) {

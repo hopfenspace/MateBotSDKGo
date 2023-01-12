@@ -25,15 +25,6 @@ type VersionInfo struct {
 	Micro uint `json:"micro"`
 }
 
-type Status struct {
-	Startup        *uint       `json:"startup"`
-	ApiVersion     uint        `json:"api_version"`
-	ProjectVersion VersionInfo `json:"project_version"`
-	Timezone       *string     `json:"timezone"`
-	Localtime      string      `json:"localtime"`
-	Timestamp      uint        `json:"timestamp"`
-}
-
 type Settings struct {
 	MinRefundApproves          uint `json:"min_refund_approves"`
 	MinRefundDisapproves       uint `json:"min_refund_disapproves"`
@@ -51,9 +42,9 @@ type Application struct {
 }
 
 type Callback struct {
-	ID            uint    `json:"id"`
-	Url           string  `json:"url"`
-	ApplicationID *uint   `json:"application_id"`
+	ID            uint   `json:"id"`
+	Url           string `json:"url"`
+	ApplicationID *uint  `json:"application_id"`
 }
 
 type Alias struct {

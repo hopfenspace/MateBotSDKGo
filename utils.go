@@ -38,18 +38,18 @@ func New(conf *Config) (*sdk, error) {
 		Currency: conf.Currency,
 	}
 
+	success, err := sdk.GetHealth()
+	if err != nil {
+		return nil, err
+	} else if !success {
+		return nil, errors.New("unhealthy API server")
+	}
+
 	token, err := GetLoginToken(conf.Username, conf.Password, conf.BaseUrl)
 	if err != nil {
 		return nil, err
 	}
 	sdk.accessToken = token.AccessToken
-
-	status, err := sdk.GetStatus()
-	if err != nil {
-		return nil, err
-	}
-	sdk.APIVersion = status.ApiVersion
-	sdk.serverVersion = status.ProjectVersion
 
 	apps, err := sdk.GetApplications(map[string]string{"name": sdk.Username})
 	if err != nil {

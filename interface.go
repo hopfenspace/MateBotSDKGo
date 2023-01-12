@@ -7,7 +7,7 @@ type SDK interface {
 	GetCurrency() Currency
 	FormatBalance(balance int) string
 
-	GetStatus() (*Status, error)
+	GetHealth() (bool, error)
 	GetSettings() (*Settings, error)
 	GetAliases(filter map[string]string) ([]*Alias, error)
 	GetApplications(filter map[string]string) ([]*Application, error)
