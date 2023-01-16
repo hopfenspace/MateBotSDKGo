@@ -21,6 +21,7 @@ type SDK interface {
 	GetVotes(filter map[string]string) ([]*Vote, error)
 
 	GetUser(userIdOrUsername any, extendedFilter *map[string]string) (*User, error)
+	GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User, error)
 	FindSponsoringUser(issuer *User) (*User, error)
 	GetCommunityBalance(issuer *User) (int, error)
 

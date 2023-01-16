@@ -294,6 +294,43 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 	return users[0], nil
 }
 
+// GetVerifiedUser returns a verified core user instance.
+// Verification steps include the active check and that an alias
+// for the current application exists, which has to be confirmed.
+// The minimal privilege level will be External implicitly if unspecified.
+// The verification includes a check that the user has at least
+// the specified privilege level. Use this function with
+// result(s) from the GetUser function. The difference between those
+// two functions is that GetUser (and GetUsers, respectively) should be
+// used for lookups of foreign users, while this should be used for app users.
+func (s *sdk) GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User, error) {
+	user, err := s.GetUser(userId, nil)
+	if err != nil {
+		return nil, err
+	} else if !user.Active {
+		return nil, errors.New("user has been deleted")
+	}
+
+	verifiedAliasFound := false
+	for i := range user.Aliases {
+		if user.Aliases[i].Confirmed && user.Aliases[i].ApplicationID == s.GetThisApplicationID() {
+			verifiedAliasFound = true
+		}
+	}
+	if !verifiedAliasFound {
+		return nil, errors.New(fmt.Sprintf("The user alias for %s is not confirmed yet. It can't be used while the connection to the other MateBot apps wasn't verified.", user.Name))
+	}
+
+	if minimalLevel == nil {
+		l := External
+		minimalLevel = &l
+	}
+	if user.Privilege() < *minimalLevel {
+		return nil, errors.New(fmt.Sprintf("You don't have the required privileges %s is not confirmed yet. It can't be used while the connection to the other MateBot apps wasn't verified.", user.Name))
+	}
+	return user, nil
+}
+
 func (s *sdk) FindSponsoringUser(issuer *User) (*User, error) {
 	if issuer == nil {
 		return nil, errors.New("invalid user account")
