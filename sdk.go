@@ -303,14 +303,21 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 // result(s) from the GetUser function. The difference between those
 // two functions is that GetUser (and GetUsers, respectively) should be
 // used for lookups of foreign users, while this should be used for app users.
-func (s *sdk) GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User, error) {
-	user, err := s.GetUser(userId, nil)
+func (s *sdk) GetVerifiedUser(coreUserID uint, minimalLevel *PrivilegeLevel) (*User, error) {
+	users, err := s.GetUsers(map[string]string{
+		"id":                   strconv.Itoa(int(coreUserID)),
+		"active":               "true",
+		"alias_application_id": strconv.Itoa(int(s.GetThisApplicationID())),
+	})
 	if err != nil {
 		return nil, err
-	} else if !user.Active {
-		return nil, errors.New("user has been deleted")
+	} else if len(users) > 1 {
+		return nil, errors.New("ambiguous user ID")
+	} else if len(users) < 1 {
+		return nil, errors.New("no user was found for the given query")
 	}
 
+	user := users[0]
 	verifiedAliasFound := false
 	for i := range user.Aliases {
 		if user.Aliases[i].Confirmed && user.Aliases[i].ApplicationID == s.GetThisApplicationID() {
@@ -326,7 +333,7 @@ func (s *sdk) GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User,
 		minimalLevel = &l
 	}
 	if user.Privilege() < *minimalLevel {
-		return nil, errors.New(fmt.Sprintf("You don't have the required privileges %s is not confirmed yet. It can't be used while the connection to the other MateBot apps wasn't verified.", user.Name))
+		return nil, errors.New("you don't have the required privileges to perform this operation, maybe open a poll to request them")
 	}
 	return user, nil
 }
