@@ -338,6 +338,18 @@ func (s *sdk) GetVerifiedUser(coreUserID uint, minimalLevel *PrivilegeLevel) (*U
 	return user, nil
 }
 
+func (s *sdk) IsUserConfirmed(user *User) bool {
+	if user == nil {
+		return false
+	}
+	for _, alias := range user.Aliases {
+		if alias.Confirmed && alias.ApplicationID == s.GetThisApplicationID() {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *sdk) FindSponsoringUser(issuer *User) (*User, error) {
 	if issuer == nil {
 		return nil, errors.New("invalid user account")

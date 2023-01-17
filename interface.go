@@ -22,6 +22,8 @@ type SDK interface {
 
 	GetUser(userIdOrUsername any, extendedFilter *map[string]string) (*User, error)
 	GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User, error)
+	IsUserConfirmed(user *User) bool
+
 	FindSponsoringUser(issuer *User) (*User, error)
 	GetCommunityBalance(issuer *User) (int, error)
 
