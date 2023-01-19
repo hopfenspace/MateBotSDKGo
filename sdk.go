@@ -16,15 +16,15 @@ type sdk struct {
 	BaseUrl           string
 	Username          string
 	password          string
-	applicationID     uint
+	applicationID     uint64
 	accessToken       string
 	Callbacks         []*Callback
 	Currency          Currency
-	communityUserID   uint
+	communityUserID   uint64
 	CommunityUsername *string
 }
 
-func (s *sdk) GetThisApplicationID() uint {
+func (s *sdk) GetThisApplicationID() uint64 {
 	return s.applicationID
 }
 
@@ -32,7 +32,7 @@ func (s *sdk) GetThisApplicationName() string {
 	return s.Username
 }
 
-func (s *sdk) GetCommunityID() uint {
+func (s *sdk) GetCommunityID() uint64 {
 	return s.communityUserID
 }
 
@@ -44,9 +44,9 @@ func (s *sdk) GetCurrency() Currency {
 	return s.Currency
 }
 
-func (s *sdk) FormatBalance(balance int) string {
+func (s *sdk) FormatBalance(balance int64) string {
 	v := float64(balance) / float64(s.Currency.Factor)
-	return fmt.Sprintf("%."+strconv.Itoa(int(s.Currency.Digits))+"f%s", v, s.Currency.Symbol)
+	return fmt.Sprintf("%."+strconv.FormatInt(s.Currency.Digits, 10)+"f %s", v, s.Currency.Symbol)
 }
 
 func (s *sdk) GetHealth() (bool, error) {
@@ -232,7 +232,7 @@ func (s *sdk) lookupUsers(name string, extendedFilter *map[string]string, isAlia
 	if isAlias {
 		filter["alias_confirmed"] = "true"
 		filter["alias_username"] = name
-		filter["alias_application_id"] = strconv.Itoa(int(s.applicationID))
+		filter["alias_application_id"] = strconv.FormatUint(s.applicationID, 10)
 	} else {
 		filter["name"] = name
 	}
@@ -250,12 +250,12 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 		return nil, err
 	}
 
-	var userID int
+	var userID uint64
 	switch userIdOrUsername.(type) {
 	case uint, uint16, uint32, uint64:
-		userID = int(userIdOrUsername.(uint))
+		userID = userIdOrUsername.(uint64)
 	case int, int16, int32, int64:
-		userID = userIdOrUsername.(int)
+		userID = userIdOrUsername.(uint64)
 	case string:
 		users, err := s.lookupUsers(userIdOrUsername.(string), extendedFilter, false)
 		if err != nil {
@@ -277,7 +277,7 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 		return nil, errors.New("invalid")
 	}
 
-	filter := map[string]string{"active": "true", "id": strconv.Itoa(userID)}
+	filter := map[string]string{"active": "true", "id": strconv.FormatUint(userID, 10)}
 	if extendedFilter != nil {
 		for k, v := range *extendedFilter {
 			filter[k] = v
@@ -303,11 +303,11 @@ func (s *sdk) GetUser(userIdOrUsername any, extendedFilter *map[string]string) (
 // result(s) from the GetUser function. The difference between those
 // two functions is that GetUser (and GetUsers, respectively) should be
 // used for lookups of foreign users, while this should be used for app users.
-func (s *sdk) GetVerifiedUser(coreUserID uint, minimalLevel *PrivilegeLevel) (*User, error) {
+func (s *sdk) GetVerifiedUser(coreUserID uint64, minimalLevel *PrivilegeLevel) (*User, error) {
 	users, err := s.GetUsers(map[string]string{
-		"id":                   strconv.Itoa(int(coreUserID)),
+		"id":                   strconv.FormatUint(coreUserID, 10),
 		"active":               "true",
-		"alias_application_id": strconv.Itoa(int(s.GetThisApplicationID())),
+		"alias_application_id": strconv.FormatUint(s.GetThisApplicationID(), 10),
 	})
 	if err != nil {
 		return nil, err
@@ -370,7 +370,7 @@ func (s *sdk) FindSponsoringUser(issuer *User) (*User, error) {
 	return users[0], nil
 }
 
-func (s *sdk) GetCommunityBalance(issuer *User) (int, error) {
+func (s *sdk) GetCommunityBalance(issuer *User) (int64, error) {
 	if issuer == nil {
 		return 0, errors.New("invalid user account")
 	} else if !issuer.Active {
@@ -385,7 +385,7 @@ func (s *sdk) GetCommunityBalance(issuer *User) (int, error) {
 	return community.Balance, nil
 }
 
-func (s *sdk) abortSomething(obj uint, issuer any, endpoint string) ([]byte, error) {
+func (s *sdk) abortSomething(obj uint64, issuer any, endpoint string) ([]byte, error) {
 	err := checkStrOrPosInt(issuer, false)
 	if err != nil {
 		return nil, err
@@ -523,7 +523,7 @@ func (s *sdk) SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, e
 	return update, err
 }
 
-func (s *sdk) DeleteUser(userID uint, issuer any) (*User, error) {
+func (s *sdk) DeleteUser(userID uint64, issuer any) (*User, error) {
 	if err := checkStrOrPosInt(issuer, false); err != nil {
 		return nil, err
 	}
@@ -549,7 +549,7 @@ func (s *sdk) DeleteUser(userID uint, issuer any) (*User, error) {
 	return user, err
 }
 
-func (s *sdk) newAlias(userID uint, username string, confirmed *bool) (*Alias, error) {
+func (s *sdk) newAlias(userID uint64, username string, confirmed *bool) (*Alias, error) {
 	var content []byte
 	if confirmed == nil {
 		if c, err := json.Marshal(newAlias{
@@ -588,7 +588,7 @@ func (s *sdk) newAlias(userID uint, username string, confirmed *bool) (*Alias, e
 	return alias, err
 }
 
-func (s *sdk) NewAlias(userID uint, username string) (*Alias, error) {
+func (s *sdk) NewAlias(userID uint64, username string) (*Alias, error) {
 	c := false
 	return s.newAlias(userID, username, &c)
 }
@@ -605,14 +605,14 @@ func (s *sdk) NewUserWithAlias(username string) (*User, error) {
 		return user, err
 	}
 
-	users, err := s.GetUsers(map[string]string{"id": strconv.Itoa(int(user.ID))})
+	users, err := s.GetUsers(map[string]string{"id": strconv.FormatUint(user.ID, 10)})
 	if err != nil {
 		return user, err
 	}
 	return users[0], err
 }
 
-func (s *sdk) ConfirmAlias(aliasID uint, issuer any) (*Alias, error) {
+func (s *sdk) ConfirmAlias(aliasID uint64, issuer any) (*Alias, error) {
 	if err := checkStrOrPosInt(issuer, false); err != nil {
 		return nil, err
 	}
@@ -638,7 +638,7 @@ func (s *sdk) ConfirmAlias(aliasID uint, issuer any) (*Alias, error) {
 	return alias, err
 }
 
-func (s *sdk) DeleteAlias(aliasID uint, issuer any) (*AliasDeletion, error) {
+func (s *sdk) DeleteAlias(aliasID uint64, issuer any) (*AliasDeletion, error) {
 	if err := checkStrOrPosInt(issuer, false); err != nil {
 		return nil, err
 	}
@@ -664,7 +664,7 @@ func (s *sdk) DeleteAlias(aliasID uint, issuer any) (*AliasDeletion, error) {
 	return deletion, err
 }
 
-func (s *sdk) SendTransaction(sender any, receiver any, amount uint, reason string) (*Transaction, error) {
+func (s *sdk) SendTransaction(sender any, receiver any, amount uint64, reason string) (*Transaction, error) {
 	if err := checkStrOrPosInt(sender, false); err != nil {
 		return nil, err
 	}
@@ -695,7 +695,7 @@ func (s *sdk) SendTransaction(sender any, receiver any, amount uint, reason stri
 	return transaction, err
 }
 
-func (s *sdk) ConsumeTransaction(consumer any, amount uint, consumable string) (*Transaction, error) {
+func (s *sdk) ConsumeTransaction(consumer any, amount uint64, consumable string) (*Transaction, error) {
 	if err := checkStrOrPosInt(consumer, false); err != nil {
 		return nil, err
 	}
@@ -722,7 +722,7 @@ func (s *sdk) ConsumeTransaction(consumer any, amount uint, consumable string) (
 	return transaction, err
 }
 
-func (s *sdk) NewCommunism(creator any, amount uint, description string) (*Communism, error) {
+func (s *sdk) NewCommunism(creator any, amount uint64, description string) (*Communism, error) {
 	if err := checkStrOrPosInt(creator, false); err != nil {
 		return nil, err
 	}
@@ -749,7 +749,7 @@ func (s *sdk) NewCommunism(creator any, amount uint, description string) (*Commu
 	return communism, err
 }
 
-func (s *sdk) abortOrCloseCommunism(communismID uint, issuer any, endpoint string) (*Communism, error) {
+func (s *sdk) abortOrCloseCommunism(communismID uint64, issuer any, endpoint string) (*Communism, error) {
 	body, err := s.abortSomething(communismID, issuer, endpoint)
 	if err != nil {
 		return nil, err
@@ -763,15 +763,15 @@ func (s *sdk) abortOrCloseCommunism(communismID uint, issuer any, endpoint strin
 	return communism, err
 }
 
-func (s *sdk) AbortCommunism(communismID uint, issuer any) (*Communism, error) {
+func (s *sdk) AbortCommunism(communismID uint64, issuer any) (*Communism, error) {
 	return s.abortOrCloseCommunism(communismID, issuer, "/v1/communisms/abort")
 }
 
-func (s *sdk) CloseCommunism(communismID uint, issuer any) (*Communism, error) {
+func (s *sdk) CloseCommunism(communismID uint64, issuer any) (*Communism, error) {
 	return s.abortOrCloseCommunism(communismID, issuer, "/v1/communisms/close")
 }
 
-func (s *sdk) changeCommunismParticipation(communismID uint, user any, endpoint string) (*Communism, error) {
+func (s *sdk) changeCommunismParticipation(communismID uint64, user any, endpoint string) (*Communism, error) {
 	if err := checkStrOrPosInt(user, false); err != nil {
 		return nil, err
 	}
@@ -797,11 +797,11 @@ func (s *sdk) changeCommunismParticipation(communismID uint, user any, endpoint 
 	return communism, err
 }
 
-func (s *sdk) IncreaseCommunismParticipation(communismID uint, user any) (*Communism, error) {
+func (s *sdk) IncreaseCommunismParticipation(communismID uint64, user any) (*Communism, error) {
 	return s.changeCommunismParticipation(communismID, user, "/v1/communisms/increaseParticipation")
 }
 
-func (s *sdk) DecreaseCommunismParticipation(communismID uint, user any) (*Communism, error) {
+func (s *sdk) DecreaseCommunismParticipation(communismID uint64, user any) (*Communism, error) {
 	return s.changeCommunismParticipation(communismID, user, "/v1/communisms/decreaseParticipation")
 }
 
@@ -835,7 +835,7 @@ func (s *sdk) NewPoll(user any, issuer any, variant string) (*Poll, error) {
 	return poll, err
 }
 
-func (s *sdk) NewRefund(creator any, amount uint, description string) (*Refund, error) {
+func (s *sdk) NewRefund(creator any, amount uint64, description string) (*Refund, error) {
 	if err := checkStrOrPosInt(creator, false); err != nil {
 		return nil, err
 	}
@@ -862,7 +862,7 @@ func (s *sdk) NewRefund(creator any, amount uint, description string) (*Refund, 
 	return refund, err
 }
 
-func (s *sdk) AbortPoll(pollID uint, issuer any) (*Poll, error) {
+func (s *sdk) AbortPoll(pollID uint64, issuer any) (*Poll, error) {
 	body, err := s.abortSomething(pollID, issuer, "/v1/polls/abort")
 	if err != nil {
 		return nil, err
@@ -876,7 +876,7 @@ func (s *sdk) AbortPoll(pollID uint, issuer any) (*Poll, error) {
 	return poll, err
 }
 
-func (s *sdk) AbortRefund(refundID uint, issuer any) (*Refund, error) {
+func (s *sdk) AbortRefund(refundID uint64, issuer any) (*Refund, error) {
 	body, err := s.abortSomething(refundID, issuer, "/v1/refunds/abort")
 	if err != nil {
 		return nil, err
@@ -890,7 +890,7 @@ func (s *sdk) AbortRefund(refundID uint, issuer any) (*Refund, error) {
 	return refund, err
 }
 
-func (s *sdk) vote(ballotID uint, user any, vote bool, endpoint string) ([]byte, error) {
+func (s *sdk) vote(ballotID uint64, user any, vote bool, endpoint string) ([]byte, error) {
 	if err := checkStrOrPosInt(user, false); err != nil {
 		return nil, err
 	}
@@ -911,7 +911,7 @@ func (s *sdk) vote(ballotID uint, user any, vote bool, endpoint string) ([]byte,
 	return body, err
 }
 
-func (s *sdk) VoteOnPollBallot(ballotID uint, user any, vote bool) (*PollVote, error) {
+func (s *sdk) VoteOnPollBallot(ballotID uint64, user any, vote bool) (*PollVote, error) {
 	body, err := s.vote(ballotID, user, vote, "/v1/polls/vote")
 	if err != nil {
 		return nil, err
@@ -925,7 +925,7 @@ func (s *sdk) VoteOnPollBallot(ballotID uint, user any, vote bool) (*PollVote, e
 	return pollVote, err
 }
 
-func (s *sdk) VoteOnRefundBallot(ballotID uint, user any, vote bool) (*RefundVote, error) {
+func (s *sdk) VoteOnRefundBallot(ballotID uint64, user any, vote bool) (*RefundVote, error) {
 	body, err := s.vote(ballotID, user, vote, "/v1/refunds/vote")
 	if err != nil {
 		return nil, err
@@ -939,7 +939,7 @@ func (s *sdk) VoteOnRefundBallot(ballotID uint, user any, vote bool) (*RefundVot
 	return refundVote, err
 }
 
-func (s *sdk) NewCallback(url string, applicationID uint, sharedSecret string) (*Callback, error) {
+func (s *sdk) NewCallback(url string, applicationID uint64, sharedSecret string) (*Callback, error) {
 	content, err := json.Marshal(newCallback{
 		Url:           url,
 		ApplicationID: applicationID,
@@ -962,7 +962,7 @@ func (s *sdk) NewCallback(url string, applicationID uint, sharedSecret string) (
 	return callback, err
 }
 
-func (s *sdk) DeleteCallback(id uint) (bool, error) {
+func (s *sdk) DeleteCallback(id uint64) (bool, error) {
 	content, err := json.Marshal(simpleID{ID: id})
 	if err != nil {
 		return false, err

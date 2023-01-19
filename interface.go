@@ -1,11 +1,11 @@
 package MateBotSDKGo
 
 type SDK interface {
-	GetThisApplicationID() uint
+	GetThisApplicationID() uint64
 	GetThisApplicationName() string
 	GetCommunityUsername() *string
 	GetCurrency() Currency
-	FormatBalance(balance int) string
+	FormatBalance(balance int64) string
 
 	GetHealth() (bool, error)
 	GetSettings() (*Settings, error)
@@ -21,7 +21,7 @@ type SDK interface {
 	GetVotes(filter map[string]string) ([]*Vote, error)
 
 	GetUser(userIdOrUsername any, extendedFilter *map[string]string) (*User, error)
-	GetVerifiedUser(userId uint, minimalLevel *PrivilegeLevel) (*User, error)
+	GetVerifiedUser(userId uint64, minimalLevel *PrivilegeLevel) (*User, error)
 	IsUserConfirmed(user *User) bool
 
 	FindSponsoringUser(issuer *User) (*User, error)
@@ -32,30 +32,30 @@ type SDK interface {
 	DropPermissionPrivilege(user any, issuer any) (*User, error)
 	SetUsername(issuer any, newName string) (*User, error)
 	SetVoucher(debtor any, voucher any, issuer any) (*VoucherUpdate, error)
-	DeleteUser(userID uint, issuer any) (*User, error)
+	DeleteUser(userID uint64, issuer any) (*User, error)
 
-	NewAlias(userID uint, username string) (*Alias, error)
+	NewAlias(userID uint64, username string) (*Alias, error)
 	NewUserWithAlias(username string) (*User, error)
-	ConfirmAlias(aliasID uint, issuer any) (*Alias, error)
-	DeleteAlias(aliasID uint, issuer any) (*AliasDeletion, error)
+	ConfirmAlias(aliasID uint64, issuer any) (*Alias, error)
+	DeleteAlias(aliasID uint64, issuer any) (*AliasDeletion, error)
 
-	SendTransaction(sender any, receiver any, amount uint, reason string) (*Transaction, error)
-	ConsumeTransaction(consumer any, amount uint, consumable string) (*Transaction, error)
+	SendTransaction(sender any, receiver any, amount uint64, reason string) (*Transaction, error)
+	ConsumeTransaction(consumer any, amount uint64, consumable string) (*Transaction, error)
 
-	NewCommunism(creator any, amount uint, description string) (*Communism, error)
-	AbortCommunism(communismID uint, issuer any) (*Communism, error)
-	CloseCommunism(communismID uint, issuer any) (*Communism, error)
-	IncreaseCommunismParticipation(communismID uint, user any) (*Communism, error)
-	DecreaseCommunismParticipation(communismID uint, user any) (*Communism, error)
+	NewCommunism(creator any, amount uint64, description string) (*Communism, error)
+	AbortCommunism(communismID uint64, issuer any) (*Communism, error)
+	CloseCommunism(communismID uint64, issuer any) (*Communism, error)
+	IncreaseCommunismParticipation(communismID uint64, user any) (*Communism, error)
+	DecreaseCommunismParticipation(communismID uint64, user any) (*Communism, error)
 
 	NewPoll(user any, issuer any, variant string) (*Poll, error)
-	AbortPoll(pollID uint, issuer any) (*Poll, error)
-	VoteOnPollBallot(ballotID uint, user any, vote bool) (*PollVote, error)
+	AbortPoll(pollID uint64, issuer any) (*Poll, error)
+	VoteOnPollBallot(ballotID uint64, user any, vote bool) (*PollVote, error)
 
-	NewRefund(creator any, amount uint, description string) (*Refund, error)
-	AbortRefund(refundID uint, issuer any) (*Refund, error)
-	VoteOnRefundBallot(ballotID uint, user any, vote bool) (*RefundVote, error)
+	NewRefund(creator any, amount uint64, description string) (*Refund, error)
+	AbortRefund(refundID uint64, issuer any) (*Refund, error)
+	VoteOnRefundBallot(ballotID uint64, user any, vote bool) (*RefundVote, error)
 
-	NewCallback(url string, applicationID uint, sharedSecret string) (*Callback, error)
-	DeleteCallback(id uint) (bool, error)
+	NewCallback(url string, applicationID uint64, sharedSecret string) (*Callback, error)
+	DeleteCallback(id uint64) (bool, error)
 }

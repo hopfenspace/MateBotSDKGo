@@ -17,8 +17,8 @@ type Config struct {
 }
 
 type Currency struct {
-	Digits uint
-	Factor uint
+	Digits int64
+	Factor int64
 	Symbol string
 }
 
@@ -60,7 +60,7 @@ func New(conf *Config) (*sdk, error) {
 	sdk.applicationID = apps[0].ID
 
 	if conf.CallbackURL != nil {
-		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.Itoa(int(sdk.applicationID))})
+		callbacks, err := sdk.GetCallbacks(map[string]string{"application_id": strconv.FormatUint(sdk.applicationID, 10)})
 		if err != nil {
 			return nil, err
 		}
