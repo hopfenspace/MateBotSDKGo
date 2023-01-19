@@ -19,12 +19,6 @@ type Token struct {
 	TokenType   string `json:"token_type"`
 }
 
-type VersionInfo struct {
-	Major int64 `json:"major"`
-	Minor int64 `json:"minor"`
-	Micro int64 `json:"micro"`
-}
-
 type Settings struct {
 	MinRefundApproves          uint64 `json:"min_refund_approves"`
 	MinRefundDisapproves       uint64 `json:"min_refund_disapproves"`
