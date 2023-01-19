@@ -25,7 +25,7 @@ type SDK interface {
 	IsUserConfirmed(user *User) bool
 
 	FindSponsoringUser(issuer *User) (*User, error)
-	GetCommunityBalance(issuer *User) (int, error)
+	GetCommunityBalance(issuer *User) (int64, error)
 
 	NewUser(username string) (*User, error)
 	DropInternalPrivilege(user any, issuer any) (*User, error)
