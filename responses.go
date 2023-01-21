@@ -123,6 +123,7 @@ type Consumable struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       uint64 `json:"price"`
+	Emoji       string `json:"emoji"`
 }
 
 type CommunismParticipant struct {
